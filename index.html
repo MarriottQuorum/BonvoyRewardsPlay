@@ -6,735 +6,507 @@
   <title>Bonvoy Rewards Play</title>
   <style>
     :root {
-      --bg-1: #090909;
-      --bg-2: #131313;
-      --panel: rgba(16, 16, 16, 0.9);
-      --panel-2: rgba(26, 26, 26, 0.95);
-      --gold: #d4af37;
-      --gold-soft: rgba(212, 175, 55, 0.22);
-      --text: #f8f4ea;
-      --muted: rgba(248, 244, 234, 0.72);
-      --line: rgba(255,255,255,0.08);
-      --shadow: 0 18px 36px rgba(0,0,0,0.45);
-      --teal: #20b59a;
-      --blue: #3d87ff;
-      --purple: #9858ff;
-      --amber: #ffb341;
+      --bg:#050505;
+      --bg2:#111111;
+      --panel:#0d0d0d;
+      --panel2:#161616;
+      --gold:#d4af37;
+      --gold-strong:#f0cf68;
+      --gold-soft:rgba(212,175,55,.18);
+      --text:#f8f2e6;
+      --muted:rgba(248,242,230,.76);
+      --line:rgba(212,175,55,.22);
+      --shadow:0 18px 50px rgba(0,0,0,.55);
+      --card-shadow:0 12px 32px rgba(0,0,0,.45), 0 0 18px rgba(212,175,55,.08);
     }
-
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      background:
-        radial-gradient(circle at top, rgba(212,175,55,0.08), transparent 35%),
-        linear-gradient(180deg, var(--bg-2), var(--bg-1));
-      color: var(--text);
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
       font-family: Arial, Helvetica, sans-serif;
-    }
-
-    body {
-      min-height: 100vh;
-      overflow: hidden;
-    }
-
-    .shell {
-      min-height: 100vh;
-      padding: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .app {
-      width: min(100%, 860px);
-      height: min(100vh - 36px, 1480px);
-      border-radius: 34px;
-      border: 1px solid rgba(212,175,55,0.24);
+      color:var(--text);
       background:
-        linear-gradient(180deg, rgba(28,28,28,0.98), rgba(8,8,8,0.98));
+        radial-gradient(circle at 50% 10%, rgba(212,175,55,.12), transparent 24%),
+        radial-gradient(circle at 20% 80%, rgba(212,175,55,.08), transparent 18%),
+        radial-gradient(circle at 80% 70%, rgba(212,175,55,.07), transparent 18%),
+        linear-gradient(180deg,#0e0e0e 0%, #040404 100%);
+      overflow:hidden;
+    }
+    .screen{
+      height:100vh;
+      width:100vw;
+      padding:20px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+    .frame{
+      position:relative;
+      width:min(100%, 920px);
+      height:min(calc(100vh - 40px), 1600px);
+      border-radius:34px;
+      border:1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(21,21,21,.985), rgba(6,6,6,.995));
       box-shadow:
-        0 0 0 1px rgba(255,255,255,0.03) inset,
-        0 0 48px rgba(212,175,55,0.12),
+        inset 0 0 0 1px rgba(255,255,255,.03),
+        inset 0 0 60px rgba(212,175,55,.06),
+        0 0 42px rgba(212,175,55,.12),
         var(--shadow);
-      padding: 24px 24px 20px;
-      display: grid;
-      grid-template-rows: auto auto 1fr auto;
-      gap: 16px;
-      position: relative;
-      overflow: hidden;
+      overflow:hidden;
+      display:grid;
+      grid-template-rows:auto auto 1fr auto;
+      gap:16px;
+      padding:20px 22px 18px;
     }
-
-    .sparkles,
-    .sparkles::before,
-    .sparkles::after {
-      position: absolute;
-      inset: 0;
-      content: "";
-      pointer-events: none;
-      background-image:
-        radial-gradient(circle at 12% 20%, rgba(212,175,55,0.22) 0 2px, transparent 3px),
-        radial-gradient(circle at 82% 14%, rgba(212,175,55,0.18) 0 1.5px, transparent 2px),
-        radial-gradient(circle at 28% 70%, rgba(212,175,55,0.12) 0 2px, transparent 3px),
-        radial-gradient(circle at 76% 74%, rgba(212,175,55,0.18) 0 2px, transparent 3px);
-      opacity: 0.45;
+    .frame::before,
+    .frame::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
     }
-
-    .sparkles::before { transform: scale(1.08); opacity: 0.18; }
-    .sparkles::after { transform: scale(0.94); opacity: 0.16; }
-
-    .topbar {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .eyebrow {
-      color: var(--gold);
-      font-size: 0.95rem;
-      letter-spacing: 0.26em;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(2.2rem, 5vw, 4.4rem);
-      line-height: 0.96;
-      letter-spacing: 0.02em;
-    }
-
-    .subtitle {
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: clamp(0.95rem, 1.8vw, 1.2rem);
-      max-width: 28rem;
-      line-height: 1.4;
-    }
-
-    .settings-btn {
-      border: 1px solid rgba(212,175,55,0.28);
-      background: rgba(18,18,18,0.9);
-      color: var(--text);
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.32);
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-      flex: 0 0 auto;
-    }
-
-    .settings-btn:hover,
-    .settings-btn:focus-visible {
-      transform: translateY(-1px);
-      border-color: rgba(212,175,55,0.55);
-      box-shadow: 0 0 24px rgba(212,175,55,0.16);
-      outline: none;
-    }
-
-    .settings-btn svg { width: 24px; height: 24px; fill: currentColor; }
-
-    .status-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      position: relative;
-      z-index: 1;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-      color: var(--muted);
-      font-size: 0.92rem;
-      font-weight: 700;
-    }
-
-    .pill .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 14px rgba(212,175,55,0.5);
-    }
-
-    .grid {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-      align-content: start;
-    }
-
-    .tile {
-      position: relative;
-      overflow: hidden;
-      padding: 18px 18px 16px;
-      border-radius: 24px;
-      border: 1px solid rgba(212,175,55,0.16);
+    .frame::before{
       background:
-        linear-gradient(180deg, rgba(30,30,30,0.96), rgba(14,14,14,0.98));
-      min-height: 180px;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-      text-align: left;
-      cursor: pointer;
+        radial-gradient(circle at 12% 18%, rgba(212,175,55,.22) 0 2px, transparent 3px),
+        radial-gradient(circle at 86% 14%, rgba(212,175,55,.18) 0 2px, transparent 3px),
+        radial-gradient(circle at 20% 76%, rgba(212,175,55,.14) 0 2px, transparent 3px),
+        radial-gradient(circle at 76% 80%, rgba(212,175,55,.2) 0 2px, transparent 3px),
+        radial-gradient(circle at 50% 4%, rgba(255,255,255,.12), transparent 18%);
+      opacity:.9;
     }
-
-    .tile:before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top right, rgba(255,255,255,0.08), transparent 40%);
-      opacity: 0.5;
-      pointer-events: none;
+    .frame::after{
+      inset:14px;
+      border-radius:26px;
+      border:1px solid rgba(212,175,55,.1);
     }
-
-    .tile:hover,
-    .tile:focus-visible {
-      transform: translateY(-2px);
-      border-color: rgba(212,175,55,0.34);
-      box-shadow: 0 0 28px rgba(212,175,55,0.11), var(--shadow);
-      outline: none;
+    .topline{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
     }
-
-    .tile.disabled {
-      opacity: 0.78;
-      cursor: default;
+    .brand{
+      display:grid;
+      gap:12px;
+      max-width:80%;
     }
-
-    .tile-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      position: relative;
-      z-index: 1;
+    .brand img{
+      width:min(100%, 520px);
+      max-width:100%;
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 0 18px rgba(212,175,55,.12));
     }
-
-    .tile-icon {
-      width: 60px;
-      height: 60px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    .subtitle{
+      color:var(--muted);
+      font-size:clamp(1rem, 1.65vw, 1.25rem);
+      line-height:1.45;
+      max-width:34rem;
+      margin-top:2px;
     }
-
-    .tile-icon svg { width: 34px; height: 34px; fill: currentColor; }
-    .tile-arrow {
-      font-size: 1.5rem;
-      color: rgba(248,244,234,0.55);
-      font-weight: 700;
+    .settings-btn{
+      width:56px;height:56px;border-radius:18px;
+      border:1px solid rgba(212,175,55,.34);
+      background:linear-gradient(180deg, #181818, #0c0c0c);
+      color:var(--text);
+      display:grid;place-items:center;cursor:pointer;
+      box-shadow: var(--card-shadow);
+      transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
     }
-
-    .tile h2 {
-      margin: 16px 0 8px;
-      font-size: clamp(1.38rem, 2.5vw, 1.9rem);
-      line-height: 1.03;
-      position: relative;
-      z-index: 1;
+    .settings-btn:hover,.settings-btn:focus-visible{transform:translateY(-1px);border-color:rgba(212,175,55,.55);box-shadow:0 0 24px rgba(212,175,55,.14), var(--card-shadow);outline:none}
+    .settings-btn svg{width:24px;height:24px;fill:currentColor}
+    .status-row{
+      position:relative;z-index:1;
+      display:flex;flex-wrap:wrap;gap:10px;
     }
-
-    .tile p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.42;
-      font-size: 0.98rem;
-      position: relative;
-      z-index: 1;
-      max-width: 22rem;
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      min-height:40px;
+      padding:8px 14px;border-radius:999px;
+      background:linear-gradient(180deg, rgba(31,31,31,.96), rgba(14,14,14,.98));
+      border:1px solid rgba(255,255,255,.06);
+      color:var(--muted);font-weight:700;font-size:.92rem;
+      box-shadow:0 8px 20px rgba(0,0,0,.28);
     }
-
-    .tile .tag {
-      margin-top: 14px;
-      display: inline-flex;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: rgba(255,255,255,0.05);
-      color: rgba(248,244,234,0.82);
-      position: relative;
-      z-index: 1;
+    .pill .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px rgba(212,175,55,.4)}
+    .games{
+      position:relative;z-index:1;
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+      align-content:start;
+      min-height:0;
     }
-
-    .tile.active-tile { border-color: rgba(212,175,55,0.38); }
-    .tile.active-tile .tag { background: rgba(212,175,55,0.14); color: var(--gold); }
-
-    .tile.teal { color: var(--teal); }
-    .tile.blue { color: var(--blue); }
-    .tile.gold { color: var(--gold); }
-    .tile.purple { color: var(--purple); }
-    .tile.amber { color: var(--amber); }
-    .tile.neutral { color: #d9d1ba; }
-
-    .tile h2, .tile p, .tile .tag, .tile-arrow { color: initial; }
-    .tile h2 { color: var(--text); }
-    .tile p { color: var(--muted); }
-    .tile .tag { color: rgba(248,244,234,0.82); }
-
-    .footer {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 0.9rem;
-      padding-top: 4px;
+    .game-card{
+      position:relative;
+      display:grid;
+      grid-template-columns:122px 1fr 34px;
+      gap:16px;
+      align-items:center;
+      min-height:130px;
+      padding:16px 18px;
+      border-radius:24px;
+      border:1px solid rgba(212,175,55,.18);
+      background:
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.08), transparent 35%),
+        linear-gradient(180deg, rgba(31,31,31,.98), rgba(12,12,12,.99));
+      box-shadow:var(--card-shadow);
+      text-decoration:none;
+      color:inherit;
+      overflow:hidden;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
     }
-
-    .footer strong { color: var(--gold); }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.56);
-      backdrop-filter: blur(6px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      z-index: 100;
+    .game-card::after{
+      content:"";
+      position:absolute;inset:0;
+      background:linear-gradient(90deg, transparent, rgba(212,175,55,.06), transparent);
+      opacity:.35;pointer-events:none;
     }
-
-    .modal-backdrop.open { display: flex; }
-
-    .modal {
-      width: min(100%, 520px);
-      border-radius: 26px;
-      border: 1px solid rgba(212,175,55,0.22);
-      background: linear-gradient(180deg, rgba(24,24,24,0.98), rgba(10,10,10,0.99));
-      box-shadow: 0 30px 70px rgba(0,0,0,0.5);
-      padding: 22px;
-      position: relative;
-      color: var(--text);
+    .game-card:hover,.game-card:focus-visible{transform:translateY(-2px);border-color:rgba(212,175,55,.4);box-shadow:0 0 30px rgba(212,175,55,.12), var(--card-shadow);outline:none}
+    .icon-hero{
+      position:relative;
+      height:94px;
+      border-radius:20px;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(circle at 50% 30%, rgba(255,255,255,.09), transparent 40%),
+        linear-gradient(180deg, rgba(28,28,28,.94), rgba(10,10,10,.98));
+      border:1px solid rgba(212,175,55,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 0 22px rgba(212,175,55,.08);
     }
-
-    .modal h3 {
-      margin: 0 0 6px;
-      font-size: 1.6rem;
+    .icon-hero svg{width:72px;height:72px;display:block}
+    .accent-gold .icon-hero{box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 0 24px rgba(212,175,55,.12)}
+    .accent-blue .icon-hero{box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 0 24px rgba(61,135,255,.14)}
+    .accent-teal .icon-hero{box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 0 24px rgba(32,181,154,.14)}
+    .accent-purple .icon-hero{box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 0 24px rgba(152,88,255,.16)}
+    .game-title{font-size:clamp(1.8rem, 3.2vw, 2.35rem);font-weight:900;line-height:1;margin:0 0 10px}
+    .game-desc{margin:0;color:var(--muted);font-size:clamp(.95rem,1.5vw,1.12rem);line-height:1.42;max-width:30rem}
+    .badge{display:inline-flex;margin-top:12px;padding:8px 12px;border-radius:999px;font-weight:800;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:var(--muted)}
+    .badge.live{color:#fff6cb;background:rgba(212,175,55,.14);border-color:rgba(212,175,55,.2)}
+    .arrow{font-size:2rem;color:#f0d989;opacity:.85;text-align:right}
+    .footer{
+      position:relative;z-index:1;
+      display:grid;gap:8px;align-content:end;
+      min-height:96px;
+      padding-top:8px;
     }
-
-    .modal .modal-sub {
-      margin: 0 0 18px;
-      color: var(--muted);
-      line-height: 1.45;
+    .footer-line{height:1px;background:linear-gradient(90deg, transparent, rgba(212,175,55,.45), transparent)}
+    .footer-copy{color:var(--muted);font-size:1rem;text-align:center}
+    .footer-copy strong{color:var(--gold)}
+    .drawer-backdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);
+      display:none;z-index:90;
     }
-
-    .form-grid {
-      display: grid;
-      gap: 14px;
+    .drawer-backdrop.show{display:block}
+    .drawer{
+      position:fixed;top:20px;right:20px;bottom:20px;width:min(86vw, 430px);
+      background:linear-gradient(180deg, rgba(20,20,20,.99), rgba(7,7,7,.995));
+      border:1px solid rgba(212,175,55,.24);border-radius:28px;
+      box-shadow:0 20px 70px rgba(0,0,0,.55), 0 0 26px rgba(212,175,55,.12);
+      padding:20px 18px 18px;z-index:100;transform:translateX(115%);
+      transition:transform .24s ease;display:grid;grid-template-rows:auto 1fr auto;gap:14px;
     }
-
-    .field {
-      padding: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
+    .drawer.show{transform:translateX(0)}
+    .drawer h2{margin:0;font-size:1.7rem}
+    .drawer p{margin:6px 0 0;color:var(--muted);line-height:1.45}
+    .settings-grid{display:grid;gap:14px;align-content:start;overflow:auto;padding-right:4px}
+    .setting-card{padding:14px;border-radius:20px;background:linear-gradient(180deg, rgba(29,29,29,.97), rgba(13,13,13,.99));border:1px solid rgba(255,255,255,.06)}
+    .setting-title{font-size:1rem;font-weight:800;margin:0 0 6px}
+    .setting-help{margin:0 0 12px;color:var(--muted);font-size:.92rem;line-height:1.45}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .segmented{display:inline-flex;gap:8px;flex-wrap:wrap}
+    .segmented button,.small-btn{
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;
+      min-height:38px;padding:8px 12px;border-radius:12px;font-weight:800
     }
-
-    .field-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-
-    .field strong { display: block; font-size: 1rem; }
-    .field small { color: var(--muted); display: block; line-height: 1.35; }
-
-    .switch {
-      appearance: none;
-      width: 56px;
-      height: 32px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.12);
-      position: relative;
-      cursor: pointer;
-      transition: background 0.18s ease;
-    }
-
-    .switch::after {
-      content: "";
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: #fff;
-      transition: transform 0.18s ease;
-    }
-
-    .switch:checked {
-      background: rgba(212,175,55,0.42);
-      border-color: rgba(212,175,55,0.48);
-    }
-
-    .switch:checked::after { transform: translateX(24px); }
-
-    .number-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 8px;
-    }
-
-    .number-row input {
-      width: 110px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(0,0,0,0.35);
-      color: var(--text);
-      padding: 11px 12px;
-      font-size: 1rem;
-      font-weight: 700;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    .btn {
-      border: 0;
-      border-radius: 14px;
-      padding: 12px 16px;
-      font-size: 0.95rem;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .btn.secondary {
-      background: rgba(255,255,255,0.08);
-      color: var(--text);
-    }
-
-    .btn.primary {
-      background: linear-gradient(180deg, #e2c258, #bc9427);
-      color: #111;
-    }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 24px;
-      transform: translateX(-50%) translateY(20px);
-      padding: 12px 16px;
-      border-radius: 999px;
-      background: rgba(18,18,18,0.94);
-      border: 1px solid rgba(212,175,55,0.22);
-      color: var(--text);
-      box-shadow: var(--shadow);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.22s ease, transform 0.22s ease;
-      z-index: 200;
-      font-weight: 700;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    @media (max-width: 780px) {
-      .shell { padding: 10px; }
-      .app {
-        width: 100%;
-        height: calc(100vh - 20px);
-        padding: 18px;
-        border-radius: 26px;
-      }
-      .grid { grid-template-columns: 1fr; }
-      .tile { min-height: 156px; }
-      .footer { font-size: 0.84rem; }
+    .segmented button.active{background:rgba(212,175,55,.16);border-color:rgba(212,175,55,.28);color:#fff6cc}
+    .small-btn{background:rgba(212,175,55,.12);border-color:rgba(212,175,55,.18)}
+    .switch{position:relative;display:inline-flex;align-items:center;gap:10px;font-weight:800}
+    .switch input{display:none}
+    .track{width:56px;height:32px;background:#2a2a2a;border-radius:999px;position:relative;border:1px solid rgba(255,255,255,.08);transition:.18s}
+    .track::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.18s}
+    .switch input:checked + .track{background:rgba(212,175,55,.34);border-color:rgba(212,175,55,.45)}
+    .switch input:checked + .track::after{left:27px;background:#ffe89c}
+    .seconds-wrap{display:flex;align-items:center;gap:8px}
+    .seconds-wrap input{width:86px;min-height:40px;background:#121212;color:var(--text);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:8px 10px;font-size:1rem;font-weight:800}
+    .drawer-actions{display:flex;justify-content:flex-end;gap:10px}
+    .placeholder{opacity:.86}
+    @media (max-width: 760px){
+      .screen{padding:10px}
+      .frame{height:calc(100vh - 20px);padding:16px 16px 14px;gap:12px;border-radius:28px}
+      .topline{align-items:flex-start}
+      .brand{max-width:calc(100% - 68px)}
+      .brand img{width:min(100%, 420px)}
+      .subtitle{font-size:.98rem;max-width:unset}
+      .games{gap:12px}
+      .game-card{grid-template-columns:82px 1fr 22px;min-height:108px;padding:14px 14px}
+      .icon-hero{height:72px;border-radius:16px}
+      .icon-hero svg{width:52px;height:52px}
+      .game-title{font-size:1.5rem}
+      .game-desc{font-size:.94rem;max-width:unset}
+      .badge{margin-top:10px}
+      .footer{min-height:74px}
+      .drawer{top:10px;right:10px;bottom:10px;width:min(92vw,420px)}
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <div class="app">
-      <div class="sparkles"></div>
-
-      <div class="topbar">
-        <div>
-          <div class="eyebrow">Marriott Bonvoy</div>
-          <h1>Bonvoy Rewards Play</h1>
-          <p class="subtitle">Choose a guest game, keep the settings tucked away here, and return home automatically after each prize reveal.</p>
+  <div class="screen">
+    <main class="frame">
+      <div class="topline">
+        <div class="brand">
+          <img src="BONVOY_WORDMARK_2C_REV_RGB.png" alt="Marriott Bonvoy" />
+          <div class="subtitle">Choose a guest game, keep settings tucked away here, and return home automatically after each prize reveal.</div>
         </div>
-        <button class="settings-btn" id="openSettings" aria-label="Open settings">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.18 7.18 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 1h-3.8a.5.5 0 0 0-.49.42l-.36 2.54c-.58.23-1.13.54-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 7.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.5.4 1.05.71 1.63.94l.36 2.54a.5.5 0 0 0 .49.42h3.8a.5.5 0 0 0 .49-.42l.36-2.54c.58-.23 1.13-.54 1.63-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/></svg>
+        <button class="settings-btn" id="settingsBtn" aria-label="Open settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94a7.96 7.96 0 0 0 .06-.94c0-.32-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.41 7.41 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.8a.5.5 0 0 0-.49.42l-.36 2.54c-.58.22-1.12.54-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.62-.06.94s.02.63.06.94L2.83 14.2a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.31.6.22l2.39-.96c.5.4 1.05.72 1.63.94l.36 2.54c.04.24.24.42.49.42h3.8c.25 0 .45-.18.49-.42l.36-2.54c.58-.22 1.13-.54 1.63-.94l2.39.96c.22.09.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/></svg>
         </button>
       </div>
 
-      <div class="status-row">
-        <div class="pill"><span class="dot"></span><span id="statusAuto">Auto-return off</span></div>
-        <div class="pill"><span class="dot"></span><span id="statusPath">Lucky Loop path: standard</span></div>
-        <div class="pill"><span class="dot"></span><span id="statusSound">Sound: on</span></div>
-      </div>
+      <div class="status-row" id="statusRow"></div>
 
-      <div class="grid">
-        <button class="tile active-tile gold" data-link="lucky-loop.html">
-          <div class="tile-top">
-            <div class="tile-icon">
-              <svg viewBox="0 0 24 24"><path d="M11 2h2v4h-2V2Zm0 16h2v4h-2v-4ZM2 11h4v2H2v-2Zm16 0h4v2h-4v-2ZM5.64 4.22l1.41-1.41 2.83 2.83-1.41 1.41-2.83-2.83Zm8.48 8.48 1.41-1.41 5.66 5.66-1.41 1.41-5.66-5.66ZM4.22 18.36l5.66-5.66 1.41 1.41-5.66 5.66-1.41-1.41Zm12.72-12.72 2.83-2.83 1.41 1.41-2.83 2.83-1.41-1.41ZM12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm0 2a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6Z"/></svg>
-            </div>
-            <div class="tile-arrow">›</div>
+      <section class="games">
+        <a class="game-card accent-gold" href="lucky-loop.html">
+          <div class="icon-hero">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#d4af37" stroke-width="7"/>
+              <circle cx="60" cy="60" r="9" fill="#d4af37"/>
+              <path d="M60 16v18M60 86v18M16 60h18M86 60h18M30 30l13 13M77 77l13 13M90 30 77 43M43 77 30 90" stroke="#f2dd87" stroke-width="5" stroke-linecap="round"/>
+            </svg>
           </div>
-          <h2>Lucky Loop</h2>
-          <p>Your upgraded Press Your Luck board. Spin, stop, reveal, and celebrate the prize with a full winner animation.</p>
-          <span class="tag">Live now</span>
-        </button>
-
-        <button class="tile teal disabled" data-soon="Spin &amp; Win is next in line.">
-          <div class="tile-top">
-            <div class="tile-icon">
-              <svg viewBox="0 0 24 24"><path d="M12 2.5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 12 2.5Zm0 2a7.4 7.4 0 0 1 5.23 2.17L12.71 11H6.08A7.49 7.49 0 0 1 12 4.5Zm0 15a7.49 7.49 0 0 1-5.92-2.9l5.92-4.4 5.23 4.33A7.4 7.4 0 0 1 12 19.5ZM13 12l5.68-4.72A7.45 7.45 0 0 1 19.5 12a7.4 7.4 0 0 1-1.02 3.77L13 12Z"/></svg>
-            </div>
-            <div class="tile-arrow">›</div>
+          <div>
+            <h2 class="game-title">Lucky Loop</h2>
+            <p class="game-desc">Your upgraded Press Your Luck board. Spin, stop, reveal, and celebrate the prize with a stronger winner moment.</p>
+            <span class="badge live">Live now</span>
           </div>
-          <h2>Spin &amp; Win</h2>
-          <p>A portrait wheel with bigger segments, cleaner icons, and the same black-and-gold visual system.</p>
-          <span class="tag">Placeholder</span>
-        </button>
+          <div class="arrow">›</div>
+        </a>
 
-        <button class="tile blue disabled" data-soon="Match &amp; Win placeholder ready.">
-          <div class="tile-top">
-            <div class="tile-icon">
-              <svg viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v12h12V6H6Zm2.5 2.5h2.5V11H8.5V8.5Zm4 0H15V11h-2.5V8.5Zm-4 4h2.5V15H8.5v-2.5Zm4 0H15V15h-2.5v-2.5Z"/></svg>
-            </div>
-            <div class="tile-arrow">›</div>
+        <div class="game-card accent-blue placeholder" tabindex="0">
+          <div class="icon-hero">
+            <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="46" fill="none" stroke="#43b7ff" stroke-width="7"/><path d="M60 14v18" stroke="#d4af37" stroke-width="6" stroke-linecap="round"/><circle cx="60" cy="60" r="8" fill="#d4af37"/><path d="M60 60 89 40" stroke="#f5ebc4" stroke-width="7" stroke-linecap="round"/></svg>
           </div>
-          <h2>Match &amp; Win</h2>
-          <p>Luxury card backs, quick reveal pacing, and a stronger mystery moment before the match appears.</p>
-          <span class="tag">Placeholder</span>
-        </button>
-
-        <button class="tile purple disabled" data-soon="Pick Your Prize placeholder ready.">
-          <div class="tile-top">
-            <div class="tile-icon">
-              <svg viewBox="0 0 24 24"><path d="M7 4h10l1 3h1a2 2 0 0 1 2 2v8.5A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5V9a2 2 0 0 1 2-2h1l1-3Zm1.44 3h7.12l-.34-1H8.78l-.34 1ZM5 9v8.5c0 .28.22.5.5.5h13a.5.5 0 0 0 .5-.5V9H5Z"/></svg>
-            </div>
-            <div class="tile-arrow">›</div>
+          <div>
+            <h2 class="game-title">Spin &amp; Win</h2>
+            <p class="game-desc">A portrait wheel with larger segments, bolder visuals, and the same luxury black-and-gold system.</p>
+            <span class="badge">Placeholder</span>
           </div>
-          <h2>Pick Your Prize</h2>
-          <p>Choose from 3–5 mystery suitcases with only color accents showing before the winner reveal.</p>
-          <span class="tag">Placeholder</span>
-        </button>
+          <div class="arrow">›</div>
+        </div>
 
-        <button class="tile amber disabled" data-soon="Points Jackpot placeholder ready.">
-          <div class="tile-top">
-            <div class="tile-icon">
-              <svg viewBox="0 0 24 24"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm0 2v10h16V7H4Zm2 2h3v6H6V9Zm4.5 0h3v6h-3V9Zm4.5 0h3v6h-3V9Z"/></svg>
-            </div>
-            <div class="tile-arrow">›</div>
+        <div class="game-card accent-gold placeholder" tabindex="0">
+          <div class="icon-hero">
+            <svg viewBox="0 0 120 120" aria-hidden="true"><rect x="18" y="24" width="28" height="40" rx="6" fill="none" stroke="#d4af37" stroke-width="5"/><rect x="46" y="18" width="28" height="48" rx="6" fill="none" stroke="#f2dd87" stroke-width="6"/><rect x="74" y="24" width="28" height="40" rx="6" fill="none" stroke="#d4af37" stroke-width="5"/><text x="32" y="51" text-anchor="middle" font-size="28" fill="#d4af37" font-weight="900">?</text><text x="60" y="51" text-anchor="middle" font-size="32" fill="#f2dd87" font-weight="900">?</text><text x="88" y="51" text-anchor="middle" font-size="28" fill="#d4af37" font-weight="900">?</text></svg>
           </div>
-          <h2>Points Jackpot</h2>
-          <p>Weighted number reels built to favor smaller wins while still leaving room for a fun bigger hit.</p>
-          <span class="tag">Placeholder</span>
-        </button>
-
-        <button class="tile neutral disabled" data-soon="More game slots are ready when you are.">
-          <div class="tile-top">
-            <div class="tile-icon">
-              <svg viewBox="0 0 24 24"><path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4Z"/></svg>
-            </div>
-            <div class="tile-arrow">›</div>
+          <div>
+            <h2 class="game-title">Match &amp; Win</h2>
+            <p class="game-desc">Luxury card backs, quick reveal pacing, and a stronger mystery moment before the match appears.</p>
+            <span class="badge">Placeholder</span>
           </div>
-          <h2>Coming Soon</h2>
-          <p>Reserved for future seasonal games, holiday promos, or property-specific one-off experiences.</p>
-          <span class="tag">Placeholder</span>
-        </button>
-      </div>
+          <div class="arrow">›</div>
+        </div>
 
-      <div class="footer">
-        <div><strong>Current live game:</strong> Lucky Loop</div>
-        <div>Main settings stay here so every game can stay clean and guest-facing.</div>
-      </div>
-    </div>
+        <div class="game-card accent-teal placeholder" tabindex="0">
+          <div class="icon-hero">
+            <svg viewBox="0 0 120 120" aria-hidden="true"><rect x="22" y="30" width="76" height="56" rx="10" fill="none" stroke="#d4af37" stroke-width="6"/><path d="M44 30v-10c0-5 4-8 8-8h16c4 0 8 3 8 8v10" fill="none" stroke="#f2dd87" stroke-width="5"/><rect x="50" y="50" width="20" height="16" rx="4" fill="none" stroke="#20b59a" stroke-width="5"/></svg>
+          </div>
+          <div>
+            <h2 class="game-title">Pick Your Prize</h2>
+            <p class="game-desc">Choose from 3–5 mystery suitcases with only color accents showing before the winner reveal.</p>
+            <span class="badge">Placeholder</span>
+          </div>
+          <div class="arrow">›</div>
+        </div>
+
+        <div class="game-card accent-purple placeholder" tabindex="0">
+          <div class="icon-hero">
+            <svg viewBox="0 0 120 120" aria-hidden="true"><rect x="18" y="24" width="84" height="54" rx="12" fill="none" stroke="#d4af37" stroke-width="6"/><path d="M46 40h10v22H46zM60 34h10v28H60zM74 28h10v34H74z" fill="#d4af37"/><path d="M28 92h64" stroke="#9b63ff" stroke-width="6" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <h2 class="game-title">Points Jackpot</h2>
+            <p class="game-desc">Weighted number reels built to favor smaller wins while still leaving room for a fun bigger hit.</p>
+            <span class="badge">Placeholder</span>
+          </div>
+          <div class="arrow">›</div>
+        </div>
+
+        <div class="game-card placeholder" tabindex="0">
+          <div class="icon-hero">
+            <svg viewBox="0 0 120 120" aria-hidden="true"><path d="M60 28v64M28 60h64" stroke="#d4af37" stroke-width="8" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <h2 class="game-title">Coming Soon</h2>
+            <p class="game-desc">Reserved for seasonal games, holiday promos, or property-specific one-off experiences.</p>
+            <span class="badge">Placeholder</span>
+          </div>
+          <div class="arrow">›</div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-line"></div>
+        <div class="footer-copy"><strong>Current live game:</strong> Lucky Loop</div>
+        <div class="footer-copy">Main settings stay here so every game can stay clean and guest-facing.</div>
+      </footer>
+    </main>
   </div>
 
-  <div class="modal-backdrop" id="settingsModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-      <h3 id="settingsTitle">Game Center Settings</h3>
-      <p class="modal-sub">Keep all operator controls here so the guest games stay clean. These settings apply to Lucky Loop right now and can be expanded later.</p>
-
-      <div class="form-grid">
-        <div class="field">
-          <div class="field-header">
-            <div>
-              <strong>Lucky Loop random path</strong>
-              <small>Turns on the less predictable highlight path from your current game.</small>
-            </div>
-            <input class="switch" id="settingRandomPath" type="checkbox" />
-          </div>
-        </div>
-
-        <div class="field">
-          <div class="field-header">
-            <div>
-              <strong>Lucky Loop sound</strong>
-              <small>Leave this on for full win chimes and tile ticks.</small>
-            </div>
-            <input class="switch" id="settingSound" type="checkbox" />
-          </div>
-        </div>
-
-        <div class="field">
-          <div class="field-header">
-            <div>
-              <strong>Return to home after prize reveal</strong>
-              <small>When enabled, the game returns to this menu after the configured number of seconds.</small>
-            </div>
-            <input class="switch" id="settingAutoReturn" type="checkbox" />
-          </div>
-          <div class="number-row">
-            <input id="settingReturnSeconds" type="number" min="3" max="45" step="1" />
-            <small>seconds</small>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn secondary" id="cancelSettings" type="button">Cancel</button>
-        <button class="btn primary" id="saveSettings" type="button">Save Settings</button>
-      </div>
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div>
+      <h2>Game settings</h2>
+      <p>Keep controls here so the guest screens stay clean. These settings currently affect Lucky Loop and home return timing.</p>
     </div>
-  </div>
+    <div class="settings-grid">
+      <section class="setting-card">
+        <h3 class="setting-title">Lucky Loop path</h3>
+        <p class="setting-help">Choose the board travel style for the live game.</p>
+        <div class="segmented" id="pathButtons">
+          <button type="button" data-path="standard">Standard</button>
+          <button type="button" data-path="random">Random</button>
+        </div>
+      </section>
 
-  <div class="toast" id="toast"></div>
+      <section class="setting-card">
+        <h3 class="setting-title">Lucky Loop sound</h3>
+        <p class="setting-help">Turn game sound on or off from the main hub.</p>
+        <label class="switch">
+          <input type="checkbox" id="soundToggle" />
+          <span class="track"></span>
+          <span id="soundLabel">On</span>
+        </label>
+      </section>
+
+      <section class="setting-card">
+        <h3 class="setting-title">Auto-return to home</h3>
+        <p class="setting-help">After a prize is shown, go back to the game menu automatically.</p>
+        <div class="row">
+          <label class="switch">
+            <input type="checkbox" id="autoReturnToggle" />
+            <span class="track"></span>
+            <span id="returnLabel">On</span>
+          </label>
+          <div class="seconds-wrap">
+            <input type="number" id="autoReturnSeconds" min="3" max="60" step="1" />
+            <span>sec</span>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="drawer-actions">
+      <button class="small-btn" type="button" id="closeDrawerBtn">Done</button>
+    </div>
+  </aside>
 
   <script>
     const STORAGE_KEY = 'bonvoyRewardsPlaySettings';
-    const DEFAULT_SETTINGS = {
-      appName: 'Bonvoy Rewards Play',
+    const defaults = {
       autoReturnEnabled: true,
       autoReturnSeconds: 10,
       luckyLoopRandomPath: false,
       luckyLoopSound: true
     };
 
-    function getSettings() {
+    const settingsBtn = document.getElementById('settingsBtn');
+    const drawer = document.getElementById('drawer');
+    const drawerBackdrop = document.getElementById('drawerBackdrop');
+    const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+    const pathButtons = [...document.querySelectorAll('#pathButtons button')];
+    const soundToggle = document.getElementById('soundToggle');
+    const autoReturnToggle = document.getElementById('autoReturnToggle');
+    const autoReturnSeconds = document.getElementById('autoReturnSeconds');
+    const soundLabel = document.getElementById('soundLabel');
+    const returnLabel = document.getElementById('returnLabel');
+    const statusRow = document.getElementById('statusRow');
+
+    function loadSettings(){
       try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-        return { ...DEFAULT_SETTINGS, ...saved };
-      } catch (err) {
-        return { ...DEFAULT_SETTINGS };
+        return { ...defaults, ...(JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}) };
+      } catch (e) {
+        return { ...defaults };
       }
     }
 
-    function saveSettings(settings) {
+    function saveSettings(settings){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     }
 
-    const modal = document.getElementById('settingsModal');
-    const toast = document.getElementById('toast');
-    const statusAuto = document.getElementById('statusAuto');
-    const statusPath = document.getElementById('statusPath');
-    const statusSound = document.getElementById('statusSound');
+    let settings = loadSettings();
 
-    const settingRandomPath = document.getElementById('settingRandomPath');
-    const settingSound = document.getElementById('settingSound');
-    const settingAutoReturn = document.getElementById('settingAutoReturn');
-    const settingReturnSeconds = document.getElementById('settingReturnSeconds');
-
-    function renderStatuses() {
-      const settings = getSettings();
-      statusAuto.textContent = settings.autoReturnEnabled
-        ? `Auto-return: ${settings.autoReturnSeconds}s`
-        : 'Auto-return off';
-      statusPath.textContent = `Lucky Loop path: ${settings.luckyLoopRandomPath ? 'random' : 'standard'}`;
-      statusSound.textContent = `Sound: ${settings.luckyLoopSound ? 'on' : 'off'}`;
-    }
-
-    function openModal() {
-      const settings = getSettings();
-      settingRandomPath.checked = !!settings.luckyLoopRandomPath;
-      settingSound.checked = !!settings.luckyLoopSound;
-      settingAutoReturn.checked = !!settings.autoReturnEnabled;
-      settingReturnSeconds.value = settings.autoReturnSeconds;
-      modal.classList.add('open');
-      modal.setAttribute('aria-hidden', 'false');
-    }
-
-    function closeModal() {
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
-    }
-
-    let toastTimer = null;
-    function showToast(message) {
-      toast.textContent = message;
-      toast.classList.add('show');
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
-    }
-
-    document.getElementById('openSettings').addEventListener('click', openModal);
-    document.getElementById('cancelSettings').addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
-    });
-
-    document.getElementById('saveSettings').addEventListener('click', () => {
-      const seconds = Math.max(3, Math.min(45, Number(settingReturnSeconds.value || DEFAULT_SETTINGS.autoReturnSeconds)));
-      const settings = {
-        ...getSettings(),
-        luckyLoopRandomPath: settingRandomPath.checked,
-        luckyLoopSound: settingSound.checked,
-        autoReturnEnabled: settingAutoReturn.checked,
-        autoReturnSeconds: seconds
-      };
-      saveSettings(settings);
-      renderStatuses();
-      closeModal();
-      showToast('Settings saved');
-    });
-
-    document.querySelectorAll('.tile').forEach((tile) => {
-      tile.addEventListener('click', () => {
-        const link = tile.dataset.link;
-        const soon = tile.dataset.soon;
-        if (link) {
-          window.location.href = link;
-          return;
-        }
-        if (soon) showToast(soon);
+    function renderStatus(){
+      statusRow.innerHTML = '';
+      const items = [
+        settings.autoReturnEnabled ? `Auto-return: ${settings.autoReturnSeconds}s` : 'Auto-return: off',
+        `Lucky Loop path: ${settings.luckyLoopRandomPath ? 'random' : 'standard'}`,
+        `Sound: ${settings.luckyLoopSound ? 'on' : 'off'}`
+      ];
+      items.forEach(text => {
+        const pill = document.createElement('div');
+        pill.className = 'pill';
+        pill.innerHTML = '<span class="dot"></span><span>' + text + '</span>';
+        statusRow.appendChild(pill);
       });
+    }
+
+    function renderDrawer(){
+      pathButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.path === (settings.luckyLoopRandomPath ? 'random' : 'standard')));
+      soundToggle.checked = !!settings.luckyLoopSound;
+      autoReturnToggle.checked = !!settings.autoReturnEnabled;
+      autoReturnSeconds.value = settings.autoReturnSeconds;
+      autoReturnSeconds.disabled = !settings.autoReturnEnabled;
+      soundLabel.textContent = settings.luckyLoopSound ? 'On' : 'Off';
+      returnLabel.textContent = settings.autoReturnEnabled ? 'On' : 'Off';
+      renderStatus();
+    }
+
+    function openDrawer(){
+      drawer.classList.add('show');
+      drawerBackdrop.classList.add('show');
+      drawer.setAttribute('aria-hidden', 'false');
+    }
+    function closeDrawer(){
+      drawer.classList.remove('show');
+      drawerBackdrop.classList.remove('show');
+      drawer.setAttribute('aria-hidden', 'true');
+    }
+
+    settingsBtn.addEventListener('click', openDrawer);
+    closeDrawerBtn.addEventListener('click', closeDrawer);
+    drawerBackdrop.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeDrawer(); });
+
+    pathButtons.forEach(btn => btn.addEventListener('click', () => {
+      settings.luckyLoopRandomPath = btn.dataset.path === 'random';
+      saveSettings(settings);
+      renderDrawer();
+    }));
+
+    soundToggle.addEventListener('change', () => {
+      settings.luckyLoopSound = soundToggle.checked;
+      saveSettings(settings);
+      renderDrawer();
     });
 
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
+    autoReturnToggle.addEventListener('change', () => {
+      settings.autoReturnEnabled = autoReturnToggle.checked;
+      saveSettings(settings);
+      renderDrawer();
     });
 
-    renderStatuses();
+    autoReturnSeconds.addEventListener('change', () => {
+      let n = parseInt(autoReturnSeconds.value || defaults.autoReturnSeconds, 10);
+      if (Number.isNaN(n)) n = defaults.autoReturnSeconds;
+      n = Math.max(3, Math.min(60, n));
+      settings.autoReturnSeconds = n;
+      saveSettings(settings);
+      renderDrawer();
+    });
+
+    renderDrawer();
   </script>
 </body>
 </html>
