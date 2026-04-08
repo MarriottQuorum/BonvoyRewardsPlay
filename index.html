@@ -1,60 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bonvoy Rewards Play</title>
-<style>
-:root{--gold:#d4af37;--gold2:#f1df93;--text:#f7f3ea;--muted:#d0c7b7}
-*{box-sizing:border-box} html,body{height:100%;margin:0}
-body{font-family:Arial,Helvetica,sans-serif;color:var(--text);background:radial-gradient(circle at 50% 10%, rgba(212,175,55,.14), transparent 26%),linear-gradient(180deg,#121212 0%,#040404 100%);overflow:hidden}
-.screen{min-height:100%;padding:10px;display:grid;place-items:center}
-.frame{width:min(96vw,820px);height:min(96vh,1480px);border-radius:28px;border:1px solid rgba(212,175,55,.34);box-shadow:0 0 0 2px rgba(212,175,55,.08) inset,0 0 40px rgba(212,175,55,.12),inset 0 0 90px rgba(212,175,55,.05);background:radial-gradient(circle at 50% 7%, rgba(212,175,55,.11), transparent 24%),linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)),#060606;position:relative;overflow:hidden;padding:14px 14px 18px;display:grid;grid-template-rows:auto 1fr auto}
-.frame:before{content:'';position:absolute;inset:8px;border-radius:22px;border:1px solid rgba(212,175,55,.18);pointer-events:none}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;z-index:2}.eyebrow{color:var(--gold);font-weight:800;letter-spacing:.25em;text-transform:uppercase;font-size:clamp(12px,1.15vw,18px);margin-bottom:4px}.title{margin:0;line-height:.95;letter-spacing:-.04em;font-size:clamp(44px,6.4vw,84px);font-weight:900}.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.btn{border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,#1a1a1a,#0d0d0d);color:#fff;border-radius:16px;padding:12px 16px;font-weight:800;font-size:clamp(14px,1.35vw,22px);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.35)}
-.hero{display:grid;justify-items:center;text-align:center;gap:10px;margin-top:10px}.hero img{width:min(52vw,340px);height:auto}.hero-sub{max-width:720px;font-size:clamp(18px,2vw,28px);color:var(--muted)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%}.card{position:relative;border-radius:26px;overflow:hidden;border:1px solid rgba(212,175,55,.2);min-height:210px;padding:20px;display:grid;align-content:space-between;text-decoration:none;color:inherit;box-shadow:inset 0 0 22px rgba(255,255,255,.05),0 0 24px rgba(0,0,0,.28)}.card:before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 24%, rgba(255,255,255,.13), transparent 34%);pointer-events:none}.k{font-size:clamp(12px,1vw,16px);letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:800}.t{font-size:clamp(30px,4.1vw,52px);line-height:.92;font-weight:900;letter-spacing:-.04em;margin-top:8px}.d{font-size:clamp(16px,1.6vw,24px);color:#efe8da;max-width:90%;margin-top:12px}.glyph{position:absolute;right:18px;bottom:18px;width:88px;height:88px;color:rgba(255,245,200,.92);filter:drop-shadow(0 0 16px rgba(255,220,120,.22))}
-.loop{background:radial-gradient(circle at 50% 20%, rgba(255,255,255,.14), transparent 34%), linear-gradient(180deg,#173f8f,#0d1d3f)} .wheel{background:radial-gradient(circle at 50% 20%, rgba(255,255,255,.14), transparent 34%), linear-gradient(180deg,#1d6f79,#0f3135)} .plinko{background:radial-gradient(circle at 50% 20%, rgba(255,255,255,.14), transparent 34%), linear-gradient(180deg,#915816,#4a2a09)} .match{background:radial-gradient(circle at 50% 20%, rgba(255,255,255,.12), transparent 34%), linear-gradient(180deg,#70308f,#321341)} .pick{background:radial-gradient(circle at 50% 20%, rgba(255,255,255,.12), transparent 34%), linear-gradient(180deg,#1d5f4a,#0e2e24)} .jackpot{background:radial-gradient(circle at 50% 20%, rgba(255,255,255,.12), transparent 34%), linear-gradient(180deg,#9f7722,#4f3a0d)}
-.settings-btn{position:absolute;top:18px;right:18px;width:56px;height:56px;border-radius:50%;border:1px solid rgba(212,175,55,.28);background:linear-gradient(180deg,#1a1a1a,#0d0d0d);color:var(--gold2);cursor:pointer;box-shadow:0 0 18px rgba(0,0,0,.32)}.settings-btn svg{width:28px;height:28px}.panel{position:absolute;right:18px;top:84px;width:min(82vw,420px);border-radius:24px;border:1px solid rgba(212,175,55,.24);background:linear-gradient(180deg, rgba(20,20,20,.98), rgba(8,8,8,.98));box-shadow:0 14px 44px rgba(0,0,0,.52), inset 0 0 18px rgba(212,175,55,.06);padding:18px;display:none;z-index:20}.panel.show{display:block}.panel h3{margin:0 0 14px;font-size:28px;letter-spacing:-.03em}.row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:10px 0;border-top:1px solid rgba(255,255,255,.06)}.row:first-of-type{border-top:none}.row label{font-size:18px;color:#f1ebde;font-weight:700}.help{display:block;color:#bdb29a;font-size:13px;margin-top:4px;font-weight:500}.switch{appearance:none;width:58px;height:34px;background:#333;border-radius:999px;position:relative;cursor:pointer;outline:none;border:1px solid rgba(255,255,255,.08)}.switch:checked{background:linear-gradient(180deg,#e7c757,#9c7412)}.switch:after{content:'';position:absolute;width:26px;height:26px;border-radius:50%;background:#fff;top:3px;left:4px;transition:all .2s ease}.switch:checked:after{left:28px}.select,.num{background:#111;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 12px;font-weight:800;font-size:16px}.footer{display:grid;justify-items:center;gap:10px;padding-bottom:2px}.footer img{max-width:min(60vw,420px);width:100%;height:auto;opacity:.96}.footer-note{font-size:clamp(12px,1.15vw,18px);color:#d6d0c3;text-align:center}
-@media (max-width:700px){.grid{grid-template-columns:1fr}.card{min-height:180px}}
-</style>
-</head>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Bonvoy Rewards Play</title><link rel="stylesheet" href="shared.css"></head>
 <body>
 <div class="screen"><div class="frame">
-<button class="settings-btn" id="settingsBtn" aria-label="Settings"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="9"/><path d="M32 10v8M32 46v8M10 32h8M46 32h8M16.4 16.4l5.7 5.7M41.9 41.9l5.7 5.7M47.6 16.4l-5.7 5.7M22.1 41.9l-5.7 5.7"/></svg></button>
-<div class="panel" id="settingsPanel">
-<h3>Game Settings</h3>
-<div class="row"><label>Sound<span class="help">Shared across the suite</span></label><input id="soundOn" class="switch" type="checkbox"></div>
-<div class="row"><label>Popup Duration<span class="help">Winner banners close after this time</span></label><input id="popupSeconds" class="num" type="number" min="1" max="20" step="1"></div>
-<div class="row"><label>After Win<span class="help">Choose where the screen goes next</span></label><select id="afterWinAction" class="select"><option value="menu">Return to menu</option><option value="game">Return to game</option></select></div>
-<div class="row"><label>Lucky Loop Random Path<span class="help">Alternate highlight movement</span></label><input id="luckyLoopRandomPath" class="switch" type="checkbox"></div>
-<div style="display:flex;justify-content:center;gap:12px;margin-top:10px"><button class="btn" id="saveSettings">Save</button><button class="btn" id="menuFs">Full Screen</button></div>
-</div>
-<div class="top"><div><div class="eyebrow">Marriott Bonvoy</div><h1 class="title">Rewards<br>Play</h1></div><div class="controls"><button class="btn" id="headerFs">Full Screen</button></div></div>
-<div>
-<div class="hero"><img src="BONVOY_WORDMARK_2C_REV_RGB.png" alt="Bonvoy"><p class="hero-sub">A premium front-desk game suite designed for fast play, strong visuals, and memorable prize moments.</p></div>
-<div class="grid">
-<a class="card loop" href="lucky-loop.html"><div><div class="k">Game One</div><div class="t">Lucky Loop</div><div class="d">Press your luck. Stop the loop. Reveal the prize.</div></div><div class="glyph">★</div></a>
-<a class="card wheel" href="spin-win.html"><div><div class="k">Game Two</div><div class="t">Spin &amp; Win</div><div class="d">Spin the wheel. Land the hit. Celebrate the win.</div></div><div class="glyph">◎</div></a>
-<a class="card plinko" href="plinko.html"><div><div class="k">Game Three</div><div class="t">Plinko</div><div class="d">Drop the ball. Follow the path. Find the prize.</div></div><div class="glyph">●</div></a>
-<div class="card match"><div><div class="k">Game Four</div><div class="t">Match &amp; Win</div><div class="d">Flip two cards. Find the pair. Reveal the reward.</div></div><div class="glyph">✦</div></div>
-<div class="card pick"><div><div class="k">Game Five</div><div class="t">Pick Your Prize</div><div class="d">Choose a case. Open the mystery. See what is inside.</div></div><div class="glyph">◈</div></div>
-<div class="card jackpot"><div><div class="k">Game Six</div><div class="t">Points Jackpot</div><div class="d">Spin the reels. Stack the points. Chase the bigger win.</div></div><div class="glyph">↑</div></div>
-</div>
-</div>
-<div class="footer"><img src="BONVOY_LOGO_2C_REV_RGB.png" alt="Marriott Bonvoy"><div class="footer-note">Designed for portrait screens, guest visibility, and premium quick-play moments.</div></div>
+  <div class="topbar">
+    <div class="leftbrand">
+      <button class="iconbtn" id="settingsBtn" aria-label="Settings"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="9"/><path d="M32 10v8M32 46v8M10 32h8M46 32h8M16.4 16.4l5.7 5.7M41.9 41.9l5.7 5.7M47.6 16.4l-5.7 5.7M22.1 41.9l-5.7 5.7"/></svg></button>
+      <div><div class="eyebrow">Marriott Bonvoy</div><h1 class="title">Rewards<br>Play</h1></div>
+    </div>
+    <div class="controls"><button class="btn" id="headerFs">Full Screen</button></div>
+  </div>
+
+  <div class="panel" id="settingsPanel">
+    <h3>Game Settings</h3>
+    <div class="row"><label>Sound<span class="help">Shared across the suite</span></label><input id="soundOn" class="switch" type="checkbox"></div>
+    <div class="row"><label>Popup Duration<span class="help">Winner banners close after this time</span></label><input id="popupSeconds" class="num" type="number" min="1" max="20" step="1"></div>
+    <div class="row"><label>After Win<span class="help">Choose where the screen goes next</span></label><select id="afterWinAction" class="select"><option value="menu">Return to menu</option><option value="game">Return to game</option></select></div>
+    <div class="row"><label>Lucky Loop Random Path<span class="help">Alternate highlight movement</span></label><input id="luckyLoopRandomPath" class="switch" type="checkbox"></div>
+    <div style="display:flex;justify-content:center;gap:12px;margin-top:10px"><button class="btn" id="saveSettings">Save</button><button class="btn" id="menuFs">Full Screen</button></div>
+  </div>
+
+  <div class="content game-shell">
+    <div class="hero">
+      <img class="wordmark" src="BONVOY_WORDMARK_2C_REV_RGB.png" alt="Bonvoy">
+      <p class="hero-sub">A premium front-desk game suite designed for fast play, strong visuals, and memorable prize moments.</p>
+    </div>
+    <div class="menu-grid">
+      <a class="card loop" href="lucky-loop.html"><div><div class="k">Game One</div><div class="t">Lucky Loop</div><div class="d">Press your luck. Stop the loop.</div></div><div class="glyph">★</div></a>
+      <a class="card wheel" href="spin-win.html"><div><div class="k">Game Two</div><div class="t">Spin &amp; Win</div><div class="d">Spin the wheel. Land the win.</div></div><div class="glyph">◎</div></a>
+      <a class="card plinko" href="plinko.html"><div><div class="k">Game Three</div><div class="t">Plinko</div><div class="d">Drop the ball. Chase the prize.</div></div><div class="glyph">●</div></a>
+      <a class="card match" href="match-win.html"><div><div class="k">Game Four</div><div class="t">Match &amp; Win</div><div class="d">Find the pair. Reveal the reward.</div></div><div class="glyph">✦</div></a>
+      <a class="card pick" href="pick-your-prize.html"><div><div class="k">Game Five</div><div class="t">Pick Your Prize</div><div class="d">Choose a case. Open the mystery.</div></div><div class="glyph">◈</div></a>
+      <a class="card jackpot" href="points-jackpot.html"><div><div class="k">Game Six</div><div class="t">Points Jackpot</div><div class="d">Spin the reels. Chase more points.</div></div><div class="glyph">↑</div></a>
+      <a class="card slim sidewheel" href="side-view-wheel.html"><div><div class="k">Seasonal / Alternate</div><div class="t">Side-View Wheel</div><div class="d">Swipe the wheel like a real physical spin.</div></div><div class="glyph">↔</div></a>
+    </div>
+    <div class="footer"><img class="logo" src="BONVOY_LOGO_2C_REV_RGB(1).png" alt="Marriott Bonvoy"><div class="footer-note">Designed for portrait screens, guest visibility, and premium quick-play moments.</div></div>
+  </div>
 </div></div>
-<script>
-const SETTINGS_KEY='bonvoyRewardsPlaySettingsV2';
-const DEFAULT_SETTINGS={soundOn:true,popupSeconds:6,afterWinAction:'menu',luckyLoopRandomPath:false};
-function getSettings(){try{return Object.assign({},DEFAULT_SETTINGS,JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}'))}catch{return {...DEFAULT_SETTINGS}}}
-function saveSettings(next){const merged=Object.assign({},getSettings(),next||{});localStorage.setItem(SETTINGS_KEY,JSON.stringify(merged));return merged}
-function fullScreenToggle(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen().catch(()=>{})}
-const panel=document.getElementById('settingsPanel');
-document.getElementById('settingsBtn').onclick=()=>panel.classList.toggle('show');
-document.getElementById('headerFs').onclick=fullScreenToggle;document.getElementById('menuFs').onclick=fullScreenToggle;
-function hydrate(){const s=getSettings();soundOn.checked=s.soundOn;popupSeconds.value=s.popupSeconds;afterWinAction.value=s.afterWinAction;luckyLoopRandomPath.checked=s.luckyLoopRandomPath}
-document.getElementById('saveSettings').onclick=()=>{saveSettings({soundOn:soundOn.checked,popupSeconds:Number(popupSeconds.value)||6,afterWinAction:afterWinAction.value,luckyLoopRandomPath:luckyLoopRandomPath.checked});panel.classList.remove('show')};
-hydrate();document.addEventListener('click',e=>{if(!panel.contains(e.target)&&!document.getElementById('settingsBtn').contains(e.target))panel.classList.remove('show')});
-</script>
+<script src="shared.js"></script><script>installCommonUI();</script>
 </body></html>
