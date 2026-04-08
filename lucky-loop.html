@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucky Loop</title>
+  <style>
+    :root {
+      --bg1: #090909;
+      --bg2: #171717;
+      --panel: rgba(14, 14, 14, 0.92);
+      --border: rgba(212, 175, 55, 0.18);
+      --text: #f9f4e8;
+      --muted: rgba(249,244,232,0.72);
+      --gold: #d4af37;
+      --gold-soft: rgba(212,175,55,0.18);
+      --shadow: 0 16px 38px rgba(0,0,0,0.45);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top, rgba(212,175,55,0.08), transparent 30%),
+        linear-gradient(180deg, var(--bg2), var(--bg1));
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    .app {
+      width: 100%;
+      min-height: calc(100vh - 24px);
+      display: grid;
+      justify-items: center;
+      grid-template-rows: auto 1fr auto;
+      gap: 12px;
+      position: relative;
+    }
+
+    .topbar {
+      width: min(96vw, 880px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .topbar .left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .title-wrap strong {
+      display: block;
+      color: var(--gold);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      margin-bottom: 4px;
+    }
+
+    .title-wrap span {
+      display: block;
+      color: var(--text);
+      font-weight: 900;
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      white-space: nowrap;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .mini-btn {
+      border: 0;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    .board-shell {
+      width: min(96vw, 880px);
+      padding: 12px;
+      border-radius: 34px;
+      border: 1px solid rgba(212,175,55,0.22);
+      background:
+        linear-gradient(180deg, rgba(24,24,24,0.96), rgba(8,8,8,0.98));
+      box-shadow: 0 0 40px rgba(212,175,55,0.12), var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .board-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.06), transparent 26%),
+        radial-gradient(circle at 78% 80%, rgba(255,255,255,0.04), transparent 25%);
+      pointer-events: none;
+    }
+
+    .board {
+      position: relative;
+      z-index: 1;
+      width: min(92vw, 76vh);
+      height: min(92vw, 76vh);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .tile {
+      position: relative;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 8px;
+      color: var(--text);
+      user-select: none;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: linear-gradient(180deg, rgba(28,28,28,0.96), rgba(16,16,16,0.98));
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .tile::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 40%);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .tile-text {
+      position: relative;
+      z-index: 1;
+      font-weight: 900;
+      line-height: 1.05;
+      font-size: clamp(12px, 1.8vw, 22px);
+      word-break: break-word;
+      max-width: 100%;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    }
+
+    .tile.active {
+      transform: scale(1.03);
+      border-color: rgba(255,255,255,0.52);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.12) inset,
+        0 0 28px rgba(255,255,255,0.38),
+        0 0 28px rgba(212,175,55,0.22),
+        var(--shadow);
+      animation: pulseGlow 0.8s infinite;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 0 1px rgba(255,255,255,0.07) inset, 0 0 14px rgba(255,255,255,0.15), 0 0 14px rgba(212,175,55,0.12), var(--shadow); }
+      50% { box-shadow: 0 0 0 1px rgba(255,255,255,0.18) inset, 0 0 30px rgba(255,255,255,0.38), 0 0 30px rgba(212,175,55,0.28), var(--shadow); }
+      100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.07) inset, 0 0 14px rgba(255,255,255,0.15), 0 0 14px rgba(212,175,55,0.12), var(--shadow); }
+    }
+
+    .center-card {
+      grid-column: 2 / span 3;
+      grid-row: 2 / span 3;
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, rgba(16,16,16,0.96), rgba(7,7,7,0.98));
+      border: 1px solid rgba(212,175,55,0.18);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 16px 16px 14px;
+      min-width: 0;
+      min-height: 0;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    .top-controls,
+    .mid-wrap,
+    .bottom-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .top-controls {
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      min-height: 42px;
+    }
+
+    .mid-wrap {
+      flex-direction: column;
+      text-align: center;
+      gap: 14px;
+      min-height: 0;
+      padding: 8px 6px;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: clamp(0.72rem, 1vw, 0.86rem);
+      font-weight: 800;
+    }
+
+    .main-btn {
+      width: clamp(7.3rem, 13vw, 10.2rem);
+      height: clamp(7.3rem, 13vw, 10.2rem);
+      border: 0;
+      color: #111;
+      font-weight: 900;
+      font-size: clamp(1.35rem, 2.9vw, 2.6rem);
+      letter-spacing: 0.02em;
+      box-shadow: 0 0 24px rgba(212,175,55,0.22), var(--shadow);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      background: linear-gradient(180deg, #e5c35a, #b48b22);
+    }
+
+    .main-btn.spin {
+      border-radius: 999px;
+    }
+
+    .main-btn.stop {
+      color: #fff;
+      background: linear-gradient(180deg, #ba2424, #7e1515);
+      clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+      border-radius: 12px;
+    }
+
+    .main-btn.disabled {
+      background: #5a5a5a;
+      color: #f0f0f0;
+      opacity: 0.68;
+      cursor: not-allowed;
+    }
+
+    .result {
+      font-weight: 900;
+      font-size: clamp(1.2rem, 3vw, 2.8rem);
+      line-height: 1.05;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.45);
+      max-width: 96%;
+      word-break: break-word;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+      max-width: 24rem;
+    }
+
+    .bottom-controls {
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      border: 0;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      touch-action: manipulation;
+    }
+
+    .footer-note {
+      width: min(96vw, 880px);
+      display: grid;
+      gap: 3px;
+      justify-items: center;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .footer-note strong { color: var(--gold); }
+
+    .winner-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,0.05), transparent 25%),
+        rgba(6,6,6,0.78);
+      backdrop-filter: blur(4px);
+      z-index: 80;
+      overflow: hidden;
+    }
+
+    .winner-overlay.show { display: flex; }
+
+    .winner-card {
+      position: relative;
+      width: min(92vw, 760px);
+      padding: 34px 26px 30px;
+      border-radius: 30px;
+      border: 1px solid rgba(212,175,55,0.3);
+      background: linear-gradient(180deg, rgba(23,23,23,0.98), rgba(8,8,8,0.99));
+      text-align: center;
+      box-shadow: 0 0 40px rgba(212,175,55,0.18), 0 30px 70px rgba(0,0,0,0.48);
+      overflow: hidden;
+      animation: winnerPop 0.4s ease;
+    }
+
+    @keyframes winnerPop {
+      0% { transform: scale(0.88); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .winner-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.09), transparent 35%),
+        radial-gradient(circle at bottom, rgba(212,175,55,0.14), transparent 28%);
+      pointer-events: none;
+    }
+
+    .winner-title {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-size: clamp(2.4rem, 7vw, 5.6rem);
+      line-height: 0.96;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #fff7d8;
+      text-shadow: 0 0 20px rgba(212,175,55,0.35), 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .winner-sub {
+      position: relative;
+      z-index: 1;
+      margin: 14px 0 10px;
+      color: var(--gold);
+      font-size: clamp(1rem, 1.6vw, 1.18rem);
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .winner-prize {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-size: clamp(1.6rem, 4vw, 3.2rem);
+      line-height: 1.08;
+      font-weight: 900;
+      max-width: 90%;
+      margin-inline: auto;
+    }
+
+    .winner-countdown {
+      position: relative;
+      z-index: 1;
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.96rem;
+      min-height: 1.2em;
+    }
+
+    .confetti {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .confetti span {
+      position: absolute;
+      top: -12%;
+      width: 12px;
+      height: 28px;
+      border-radius: 999px;
+      opacity: 0.9;
+      animation: fall linear forwards;
+      transform-origin: center;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(115vh) rotate(360deg); opacity: 0.9; }
+    }
+
+    @media (orientation: portrait) {
+      body { padding: 8px; }
+      .app { min-height: calc(100vh - 16px); }
+      .topbar, .board-shell, .footer-note { width: min(98vw, 760px); }
+      .board {
+        width: min(96vw, 68vh);
+        height: min(96vw, 68vh);
+        gap: 8px;
+      }
+      .tile { border-radius: 18px; padding: 7px; }
+      .tile-text { font-size: clamp(11px, 2.5vw, 20px); }
+      .center-card { padding: 12px; }
+      .main-btn {
+        width: clamp(6.6rem, 17vw, 8.8rem);
+        height: clamp(6.6rem, 17vw, 8.8rem);
+        font-size: clamp(1.25rem, 4vw, 2rem);
+      }
+      .result { font-size: clamp(1rem, 4vw, 2rem); }
+      .control-btn, .mini-btn { padding: 9px 12px; font-size: 0.82rem; }
+      .topbar { flex-wrap: wrap; justify-content: center; text-align: center; }
+      .top-actions { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="left">
+        <div class="title-wrap">
+          <strong>Bonvoy Rewards Play</strong>
+          <span>Lucky Loop</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="mini-btn" id="homeBtn" type="button">Home</button>
+        <button class="mini-btn" id="resetTopBtn" type="button">Reset</button>
+        <button class="mini-btn" id="fullscreenBtn" type="button">Full Screen</button>
+      </div>
+    </div>
+
+    <div class="board-shell">
+      <div id="board" class="board"></div>
+    </div>
+
+    <div class="footer-note">
+      <div><strong>Prize source:</strong> live Google Sheet</div>
+      <div id="settingsReadout">Loading settings…</div>
+    </div>
+  </div>
+
+  <div class="winner-overlay" id="winnerOverlay" aria-hidden="true">
+    <div class="winner-card">
+      <div class="confetti" id="confetti"></div>
+      <h2 class="winner-title">Winner</h2>
+      <div class="winner-sub">Congratulations</div>
+      <p class="winner-prize" id="winnerPrize">Prize Name</p>
+      <div class="winner-countdown" id="winnerCountdown"></div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'bonvoyRewardsPlaySettings';
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTgWcTqPKI2xoPVMrQtN_7UNlDkkrFymRsMLnBNDWByUj6QgKfwq6oJbfYioTDtiuaW6JHJQuWBmwX-/pub?output=csv';
+
+    const DEFAULT_SETTINGS = {
+      autoReturnEnabled: true,
+      autoReturnSeconds: 10,
+      luckyLoopRandomPath: false,
+      luckyLoopSound: true
+    };
+
+    const DEFAULT_PRIZES = [
+      { label: '2,500 Points', accent: 'purple', weight: 4 },
+      { label: 'Free Appetizer', accent: 'amber', weight: 6 },
+      { label: '500 Points', accent: 'blue', weight: 10 },
+      { label: 'M Club Access', accent: 'gold', weight: 2 },
+      { label: 'Free Parking', accent: 'teal', weight: 4 },
+      { label: 'Breakfast for 2', accent: 'teal', weight: 3 },
+      { label: '1,000 Points', accent: 'blue', weight: 6 },
+      { label: 'Gift Shop Snack/Drink', accent: 'amber', weight: 5 },
+      { label: 'Bar Drink', accent: 'amber', weight: 4 },
+      { label: 'Spin Again', accent: 'purple', weight: 3 },
+      { label: 'Spin Again and Win Double', accent: 'purple', weight: 2 },
+      { label: '1,500 Points', accent: 'blue', weight: 5 },
+      { label: 'Starbucks Drink', accent: 'amber', weight: 4 },
+      { label: 'Late Checkout', accent: 'gold', weight: 2 },
+      { label: 'Room Upgrade', accent: 'gold', weight: 1 },
+      { label: 'Bonus Treat', accent: 'teal', weight: 3 }
+    ];
+
+    const ACCENT_STYLES = {
+      gold: { bg: 'linear-gradient(180deg, #322815, #17120a)', glow: 'rgba(212,175,55,0.22)' },
+      teal: { bg: 'linear-gradient(180deg, #10322d, #0b1817)', glow: 'rgba(32,181,154,0.26)' },
+      blue: { bg: 'linear-gradient(180deg, #10233f, #0a1019)', glow: 'rgba(61,135,255,0.26)' },
+      purple: { bg: 'linear-gradient(180deg, #26153b, #100914)', glow: 'rgba(152,88,255,0.28)' },
+      amber: { bg: 'linear-gradient(180deg, #3b2411, #18110a)', glow: 'rgba(255,179,65,0.28)' },
+      red: { bg: 'linear-gradient(180deg, #401313, #190b0b)', glow: 'rgba(232,93,93,0.26)' },
+      neutral: { bg: 'linear-gradient(180deg, #2a2a2a, #111111)', glow: 'rgba(255,255,255,0.18)' }
+    };
+
+    const N = 5;
+    const boardEl = document.getElementById('board');
+    const winnerOverlay = document.getElementById('winnerOverlay');
+    const winnerPrizeEl = document.getElementById('winnerPrize');
+    const winnerCountdownEl = document.getElementById('winnerCountdown');
+    const settingsReadout = document.getElementById('settingsReadout');
+    const confettiEl = document.getElementById('confetti');
+
+    function getSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        return { ...DEFAULT_SETTINGS, ...saved };
+      } catch (err) {
+        return { ...DEFAULT_SETTINGS };
+      }
+    }
+
+    const settings = getSettings();
+
+    function buildRingIndices(n) {
+      const idx = [];
+      for (let c = 0; c < n; c += 1) idx.push(c);
+      for (let r = 1; r < n; r += 1) idx.push(r * n + (n - 1));
+      for (let c = n - 2; c >= 0; c -= 1) idx.push((n - 1) * n + c);
+      for (let r = n - 2; r >= 1; r -= 1) idx.push(r * n);
+      return idx;
+    }
+
+    const ringCellIndices = buildRingIndices(N);
+    const cellToRingPos = new Map(ringCellIndices.map((cell, i) => [cell, i]));
+
+    const state = {
+      settings,
+      prizes: [...DEFAULT_PRIZES],
+      ringPrizes: [],
+      activeRingPos: 0,
+      isSpinning: false,
+      stopRequested: false,
+      stopCountdown: null,
+      actionMode: 'spin',
+      lastWin: null,
+      doubleNext: false,
+      randomMode: !!settings.luckyLoopRandomPath,
+      muted: !settings.luckyLoopSound,
+      currentPrize: '',
+      tickTimer: null,
+      shuffleTimer: null,
+      speed: 120,
+      audioCtx: null,
+      autoReturnTimer: null,
+      countdownTimer: null
+    };
+
+    const ui = {
+      tilesByCell: new Map(),
+      mainButton: null,
+      result: null,
+      hint: null,
+      fullscreenBtn: document.getElementById('fullscreenBtn')
+    };
+
+    function weightedPick(prizes) {
+      const total = prizes.reduce((sum, prize) => sum + Math.max(1, Number(prize.weight) || 1), 0);
+      let roll = Math.random() * total;
+      for (const prize of prizes) {
+        roll -= Math.max(1, Number(prize.weight) || 1);
+        if (roll <= 0) return prize;
+      }
+      return prizes[prizes.length - 1];
+    }
+
+    function getWeightedRingPrizes(prizes, count) {
+      const pool = [];
+      while (pool.length < count) {
+        pool.push({ ...weightedPick(prizes) });
+      }
+      return pool;
+    }
+
+    function parseCsvLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i += 1) {
+        const ch = line[i];
+        const next = line[i + 1];
+        if (ch === '"') {
+          if (inQuotes && next === '"') {
+            current += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    function normalizeHeader(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function accentFromValue(value) {
+      const key = normalizeHeader(value);
+      if (key.includes('teal')) return 'teal';
+      if (key.includes('blue')) return 'blue';
+      if (key.includes('purple')) return 'purple';
+      if (key.includes('amber')) return 'amber';
+      if (key.includes('gold')) return 'gold';
+      if (key.includes('red')) return 'red';
+      return 'neutral';
+    }
+
+    function ensureAudio() {
+      if (!state.audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (Ctx) state.audioCtx = new Ctx();
+      }
+      return state.audioCtx;
+    }
+
+    function unlockAudio() {
+      const ctx = ensureAudio();
+      if (!ctx) return;
+      const resume = () => {
+        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+      };
+      resume();
+      setTimeout(resume, 40);
+    }
+
+    function beep(step = 0) {
+      if (state.muted) return;
+      const ctx = ensureAudio();
+      if (!ctx || ctx.state !== 'running') return;
+      const scale = [523.25, 587.33, 659.25, 783.99, 987.77];
+      const freq = scale[step % scale.length];
+      const o1 = ctx.createOscillator();
+      const o2 = ctx.createOscillator();
+      const g = ctx.createGain();
+      o1.type = 'square';
+      o2.type = 'triangle';
+      o1.frequency.setValueAtTime(freq * 0.9, ctx.currentTime);
+      o2.frequency.setValueAtTime(freq * 1.35, ctx.currentTime);
+      g.gain.setValueAtTime(0.075, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.11);
+      o1.connect(g); o2.connect(g); g.connect(ctx.destination);
+      o1.start(); o2.start();
+      o1.stop(ctx.currentTime + 0.12); o2.stop(ctx.currentTime + 0.12);
+    }
+
+    function winSound() {
+      if (state.muted) return;
+      const ctx = ensureAudio();
+      if (!ctx || ctx.state !== 'running') return;
+      const notes = [523.25, 659.25, 783.99, 1046.5];
+      notes.forEach((f, i) => {
+        const o = ctx.createOscillator();
+        const h = ctx.createOscillator();
+        const g = ctx.createGain();
+        const t = ctx.currentTime + i * 0.08;
+        o.type = 'triangle';
+        h.type = 'sine';
+        o.frequency.value = f;
+        h.frequency.value = f * 2;
+        g.gain.setValueAtTime(0.09, t);
+        g.gain.exponentialRampToValueAtTime(0.00001, t + 0.34);
+        o.connect(g); h.connect(g); g.connect(ctx.destination);
+        o.start(t); h.start(t);
+        o.stop(t + 0.36); h.stop(t + 0.36);
+      });
+    }
+
+    function clearTimers() {
+      if (state.tickTimer) clearTimeout(state.tickTimer);
+      if (state.shuffleTimer) clearInterval(state.shuffleTimer);
+      if (state.autoReturnTimer) clearTimeout(state.autoReturnTimer);
+      if (state.countdownTimer) clearInterval(state.countdownTimer);
+      state.tickTimer = null;
+      state.shuffleTimer = null;
+      state.autoReturnTimer = null;
+      state.countdownTimer = null;
+    }
+
+    function updateActiveTile() {
+      for (const [cellIndex, tile] of ui.tilesByCell.entries()) {
+        const ringPos = cellToRingPos.get(cellIndex);
+        tile.classList.toggle('active', ringPos === state.activeRingPos);
+      }
+    }
+
+    function updateCenter() {
+      if (state.actionMode === 'spin') {
+        ui.mainButton.textContent = 'SPIN';
+        ui.mainButton.className = 'main-btn spin' + (state.isSpinning ? ' disabled' : '');
+        ui.mainButton.disabled = state.isSpinning;
+      } else {
+        ui.mainButton.textContent = state.stopRequested ? 'STOPPING' : 'STOP';
+        ui.mainButton.className = 'main-btn stop' + (state.stopRequested ? ' disabled' : '');
+        ui.mainButton.disabled = state.stopRequested;
+      }
+
+      ui.result.textContent = state.lastWin || (state.stopRequested ? 'Stopping…' : 'Tap spin to begin');
+      ui.hint.textContent = state.settings.autoReturnEnabled
+        ? `Auto-return is on · ${state.settings.autoReturnSeconds}s after reveal`
+        : 'Auto-return is off · stays on this game';
+      ui.fullscreenBtn.textContent = document.fullscreenElement ? 'Exit Full Screen' : 'Full Screen';
+    }
+
+    function render() {
+      updateActiveTile();
+      updateCenter();
+    }
+
+    function applyPrizeTextAndColors() {
+      for (const [cellIndex, tile] of ui.tilesByCell.entries()) {
+        const ringPos = cellToRingPos.get(cellIndex);
+        const prize = state.ringPrizes[ringPos];
+        const accent = ACCENT_STYLES[prize?.accent] || ACCENT_STYLES.neutral;
+        tile.style.background = accent.bg;
+        tile.style.boxShadow = `0 0 0 1px rgba(255,255,255,0.04) inset, 0 0 22px ${accent.glow}, var(--shadow)`;
+        tile.firstChild.textContent = prize?.label || '';
+      }
+    }
+
+    function hideWinnerOverlay() {
+      winnerOverlay.classList.remove('show');
+      winnerOverlay.setAttribute('aria-hidden', 'true');
+      winnerCountdownEl.textContent = '';
+      confettiEl.innerHTML = '';
+    }
+
+    function showWinnerOverlay(prizeLabel) {
+      winnerPrizeEl.textContent = prizeLabel;
+      winnerOverlay.classList.add('show');
+      winnerOverlay.setAttribute('aria-hidden', 'false');
+      confettiEl.innerHTML = '';
+      const colors = ['#d4af37', '#f8f4e8', '#ffcf69', '#ffffff'];
+      for (let i = 0; i < 28; i += 1) {
+        const piece = document.createElement('span');
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.background = colors[i % colors.length];
+        piece.style.animationDuration = `${3 + Math.random() * 1.8}s`;
+        piece.style.animationDelay = `${Math.random() * 0.5}s`;
+        piece.style.transform = `rotate(${Math.random() * 180}deg)`;
+        confettiEl.appendChild(piece);
+      }
+
+      if (state.settings.autoReturnEnabled) {
+        let seconds = state.settings.autoReturnSeconds;
+        winnerCountdownEl.textContent = `Returning to menu in ${seconds}s`;
+        state.countdownTimer = setInterval(() => {
+          seconds -= 1;
+          if (seconds > 0) {
+            winnerCountdownEl.textContent = `Returning to menu in ${seconds}s`;
+          }
+        }, 1000);
+        state.autoReturnTimer = setTimeout(() => {
+          window.location.href = 'index.html';
+        }, state.settings.autoReturnSeconds * 1000);
+      }
+    }
+
+    function finalizeWin() {
+      const win = state.currentPrize || state.ringPrizes[state.activeRingPos]?.label || 'Mystery Prize';
+      let finalLabel = win;
+
+      if (win === 'Spin Again') {
+        state.lastWin = 'Spin Again!';
+        state.actionMode = 'spin';
+        winSound();
+        render();
+        showWinnerOverlay('Spin Again');
+        return;
+      }
+
+      if (win === 'Spin Again and Win Double') {
+        state.lastWin = 'Spin Again and Win Double!';
+        state.doubleNext = true;
+        state.actionMode = 'spin';
+        winSound();
+        render();
+        showWinnerOverlay('Spin Again and Win Double');
+        return;
+      }
+
+      if (state.doubleNext) {
+        finalLabel = `${win} — Double!`;
+      }
+
+      state.lastWin = finalLabel;
+      state.doubleNext = false;
+      state.actionMode = 'spin';
+      winSound();
+      render();
+      showWinnerOverlay(finalLabel);
+    }
+
+    function stepOnce() {
+      if (state.randomMode) {
+        let next = Math.floor(Math.random() * ringCellIndices.length);
+        if (next === state.activeRingPos) next = (next + 1) % ringCellIndices.length;
+        state.activeRingPos = next;
+      } else {
+        state.activeRingPos = (state.activeRingPos + 1) % ringCellIndices.length;
+      }
+
+      state.currentPrize = state.ringPrizes[state.activeRingPos]?.label || '';
+      beep(state.activeRingPos);
+
+      if (state.stopRequested) {
+        state.stopCountdown -= 1;
+        state.speed = Math.min(420, state.speed + 70);
+
+        if (state.stopCountdown <= 0) {
+          state.isSpinning = false;
+          state.stopRequested = false;
+          state.stopCountdown = null;
+          state.tickTimer = null;
+          render();
+          setTimeout(finalizeWin, 220);
+          return;
+        }
+      } else {
+        state.speed = Math.max(state.randomMode ? 90 : 60, state.speed - 6);
+      }
+
+      render();
+      state.tickTimer = setTimeout(stepOnce, state.speed);
+    }
+
+    function startSpinLoop() {
+      state.isSpinning = true;
+      state.speed = state.randomMode ? 140 : 110;
+      state.tickTimer = setTimeout(stepOnce, state.speed);
+      render();
+    }
+
+    function startSpin() {
+      unlockAudio();
+      if (state.actionMode !== 'spin' || state.isSpinning) return;
+
+      hideWinnerOverlay();
+      clearTimers();
+      state.lastWin = null;
+      state.isSpinning = true;
+      state.stopRequested = false;
+      state.stopCountdown = null;
+      state.actionMode = 'stop';
+      state.ringPrizes = getWeightedRingPrizes(state.prizes, ringCellIndices.length);
+      applyPrizeTextAndColors();
+      render();
+
+      let ticks = 0;
+      state.shuffleTimer = setInterval(() => {
+        state.ringPrizes = getWeightedRingPrizes(state.prizes, ringCellIndices.length);
+        applyPrizeTextAndColors();
+        ticks += 1;
+        beep(ticks);
+
+        if (ticks >= 12) {
+          clearInterval(state.shuffleTimer);
+          state.shuffleTimer = null;
+          state.activeRingPos = Math.floor(Math.random() * ringCellIndices.length);
+          state.currentPrize = state.ringPrizes[state.activeRingPos]?.label || '';
+          render();
+          startSpinLoop();
+        }
+      }, 60);
+    }
+
+    function requestStop(ev) {
+      if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+      unlockAudio();
+      if (state.actionMode !== 'stop' || state.stopRequested) return;
+      state.stopRequested = true;
+      state.stopCountdown = 4;
+      render();
+    }
+
+    function resetBoard() {
+      unlockAudio();
+      clearTimers();
+      hideWinnerOverlay();
+      state.activeRingPos = 0;
+      state.isSpinning = false;
+      state.stopRequested = false;
+      state.stopCountdown = null;
+      state.actionMode = 'spin';
+      state.lastWin = null;
+      state.doubleNext = false;
+      state.currentPrize = '';
+      state.speed = 120;
+      state.ringPrizes = getWeightedRingPrizes(state.prizes, ringCellIndices.length);
+      applyPrizeTextAndColors();
+      render();
+    }
+
+    function toggleFullScreen() {
+      unlockAudio();
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+      setTimeout(render, 50);
+    }
+
+    function buildBoard() {
+      boardEl.innerHTML = '';
+      ui.tilesByCell = new Map();
+
+      for (let cellIndex = 0; cellIndex < N * N; cellIndex += 1) {
+        const r = Math.floor(cellIndex / N);
+        const c = cellIndex % N;
+        const inCenter = r >= 1 && r <= 3 && c >= 1 && c <= 3;
+
+        if (inCenter && r === 1 && c === 1) {
+          const center = document.createElement('div');
+          center.className = 'center-card';
+
+          const top = document.createElement('div');
+          top.className = 'top-controls';
+          const eyebrow = document.createElement('div');
+          eyebrow.className = 'eyebrow';
+          eyebrow.textContent = 'Lucky Loop';
+          top.appendChild(eyebrow);
+
+          const middle = document.createElement('div');
+          middle.className = 'mid-wrap';
+
+          const result = document.createElement('div');
+          result.className = 'result';
+          middle.appendChild(result);
+          ui.result = result;
+
+          const mainButton = document.createElement('button');
+          mainButton.className = 'main-btn spin';
+          mainButton.type = 'button';
+          mainButton.addEventListener('click', () => {
+            if (state.actionMode === 'spin') startSpin();
+            else requestStop();
+          });
+          mainButton.addEventListener('pointerdown', (e) => {
+            if (state.actionMode === 'stop') requestStop(e);
+          });
+          middle.appendChild(mainButton);
+          ui.mainButton = mainButton;
+
+          const hint = document.createElement('div');
+          hint.className = 'hint';
+          middle.appendChild(hint);
+          ui.hint = hint;
+
+          const bottom = document.createElement('div');
+          bottom.className = 'bottom-controls';
+
+          const reset = document.createElement('button');
+          reset.className = 'control-btn';
+          reset.type = 'button';
+          reset.textContent = 'Reset';
+          reset.addEventListener('click', resetBoard);
+
+          const home = document.createElement('button');
+          home.className = 'control-btn';
+          home.type = 'button';
+          home.textContent = 'Home';
+          home.addEventListener('click', () => { window.location.href = 'index.html'; });
+
+          bottom.appendChild(reset);
+          bottom.appendChild(home);
+
+          center.appendChild(top);
+          center.appendChild(middle);
+          center.appendChild(bottom);
+          boardEl.appendChild(center);
+          continue;
+        }
+
+        if (inCenter) continue;
+
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        const text = document.createElement('div');
+        text.className = 'tile-text';
+        tile.appendChild(text);
+
+        boardEl.appendChild(tile);
+        ui.tilesByCell.set(cellIndex, tile);
+      }
+    }
+
+    async function loadSheet() {
+      try {
+        const res = await fetch(SHEET_URL);
+        const csv = await res.text();
+        const cleaned = csv.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+        const lines = cleaned.split('\n').filter(Boolean);
+        if (!lines.length) throw new Error('No rows returned');
+
+        const headers = parseCsvLine(lines[0]).map(normalizeHeader);
+        const getIndex = (...names) => headers.findIndex((header) => names.includes(header));
+
+        const idxActive = getIndex('active');
+        const idxLabel = getIndex('prize label', 'label', 'name');
+        const idxAccent = getIndex('accent', 'color');
+        const idxWeight = getIndex('weight');
+
+        const parsed = lines.slice(1)
+          .map((line) => parseCsvLine(line))
+          .map((cols) => ({
+            active: idxActive >= 0 ? normalizeHeader(cols[idxActive]) : 'yes',
+            label: idxLabel >= 0 ? String(cols[idxLabel] || '').trim() : '',
+            accent: idxAccent >= 0 ? accentFromValue(cols[idxAccent]) : 'neutral',
+            weight: idxWeight >= 0 ? Math.max(1, Number(cols[idxWeight]) || 1) : 1
+          }))
+          .filter((row) => row.label)
+          .filter((row) => !['no', 'false', '0'].includes(row.active));
+
+        if (parsed.length) state.prizes = parsed;
+      } catch (err) {
+        console.warn('Failed to load sheet prizes', err);
+      }
+
+      state.ringPrizes = getWeightedRingPrizes(state.prizes, ringCellIndices.length);
+      applyPrizeTextAndColors();
+      render();
+    }
+
+    document.getElementById('homeBtn').addEventListener('click', () => { window.location.href = 'index.html'; });
+    document.getElementById('resetTopBtn').addEventListener('click', resetBoard);
+    document.getElementById('fullscreenBtn').addEventListener('click', toggleFullScreen);
+    winnerOverlay.addEventListener('click', hideWinnerOverlay);
+    document.addEventListener('fullscreenchange', render);
+
+    const oneTimeUnlock = () => {
+      unlockAudio();
+      document.removeEventListener('pointerdown', oneTimeUnlock);
+      document.removeEventListener('touchstart', oneTimeUnlock);
+      document.removeEventListener('click', oneTimeUnlock);
+    };
+
+    document.addEventListener('pointerdown', oneTimeUnlock, { passive: true });
+    document.addEventListener('touchstart', oneTimeUnlock, { passive: true });
+    document.addEventListener('click', oneTimeUnlock, { passive: true });
+
+    settingsReadout.textContent = `Settings loaded · path: ${state.randomMode ? 'random' : 'standard'} · sound: ${state.muted ? 'off' : 'on'} · auto-return: ${state.settings.autoReturnEnabled ? `${state.settings.autoReturnSeconds}s` : 'off'}`;
+
+    buildBoard();
+    state.ringPrizes = getWeightedRingPrizes(state.prizes, ringCellIndices.length);
+    applyPrizeTextAndColors();
+    render();
+    loadSheet();
+  </script>
+</body>
+</html>
