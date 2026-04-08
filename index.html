@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bonvoy Rewards Play</title>
+  <style>
+    :root {
+      --bg-1: #090909;
+      --bg-2: #131313;
+      --panel: rgba(16, 16, 16, 0.9);
+      --panel-2: rgba(26, 26, 26, 0.95);
+      --gold: #d4af37;
+      --gold-soft: rgba(212, 175, 55, 0.22);
+      --text: #f8f4ea;
+      --muted: rgba(248, 244, 234, 0.72);
+      --line: rgba(255,255,255,0.08);
+      --shadow: 0 18px 36px rgba(0,0,0,0.45);
+      --teal: #20b59a;
+      --blue: #3d87ff;
+      --purple: #9858ff;
+      --amber: #ffb341;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top, rgba(212,175,55,0.08), transparent 35%),
+        linear-gradient(180deg, var(--bg-2), var(--bg-1));
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .shell {
+      min-height: 100vh;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .app {
+      width: min(100%, 860px);
+      height: min(100vh - 36px, 1480px);
+      border-radius: 34px;
+      border: 1px solid rgba(212,175,55,0.24);
+      background:
+        linear-gradient(180deg, rgba(28,28,28,0.98), rgba(8,8,8,0.98));
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03) inset,
+        0 0 48px rgba(212,175,55,0.12),
+        var(--shadow);
+      padding: 24px 24px 20px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sparkles,
+    .sparkles::before,
+    .sparkles::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 12% 20%, rgba(212,175,55,0.22) 0 2px, transparent 3px),
+        radial-gradient(circle at 82% 14%, rgba(212,175,55,0.18) 0 1.5px, transparent 2px),
+        radial-gradient(circle at 28% 70%, rgba(212,175,55,0.12) 0 2px, transparent 3px),
+        radial-gradient(circle at 76% 74%, rgba(212,175,55,0.18) 0 2px, transparent 3px);
+      opacity: 0.45;
+    }
+
+    .sparkles::before { transform: scale(1.08); opacity: 0.18; }
+    .sparkles::after { transform: scale(0.94); opacity: 0.16; }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      font-size: 0.95rem;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 5vw, 4.4rem);
+      line-height: 0.96;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+      max-width: 28rem;
+      line-height: 1.4;
+    }
+
+    .settings-btn {
+      border: 1px solid rgba(212,175,55,0.28);
+      background: rgba(18,18,18,0.9);
+      color: var(--text);
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.32);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      flex: 0 0 auto;
+    }
+
+    .settings-btn:hover,
+    .settings-btn:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(212,175,55,0.55);
+      box-shadow: 0 0 24px rgba(212,175,55,0.16);
+      outline: none;
+    }
+
+    .settings-btn svg { width: 24px; height: 24px; fill: currentColor; }
+
+    .status-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .pill .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 14px rgba(212,175,55,0.5);
+    }
+
+    .grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-content: start;
+    }
+
+    .tile {
+      position: relative;
+      overflow: hidden;
+      padding: 18px 18px 16px;
+      border-radius: 24px;
+      border: 1px solid rgba(212,175,55,0.16);
+      background:
+        linear-gradient(180deg, rgba(30,30,30,0.96), rgba(14,14,14,0.98));
+      min-height: 180px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .tile:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(255,255,255,0.08), transparent 40%);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .tile:hover,
+    .tile:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(212,175,55,0.34);
+      box-shadow: 0 0 28px rgba(212,175,55,0.11), var(--shadow);
+      outline: none;
+    }
+
+    .tile.disabled {
+      opacity: 0.78;
+      cursor: default;
+    }
+
+    .tile-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tile-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    .tile-icon svg { width: 34px; height: 34px; fill: currentColor; }
+    .tile-arrow {
+      font-size: 1.5rem;
+      color: rgba(248,244,234,0.55);
+      font-weight: 700;
+    }
+
+    .tile h2 {
+      margin: 16px 0 8px;
+      font-size: clamp(1.38rem, 2.5vw, 1.9rem);
+      line-height: 1.03;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tile p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.42;
+      font-size: 0.98rem;
+      position: relative;
+      z-index: 1;
+      max-width: 22rem;
+    }
+
+    .tile .tag {
+      margin-top: 14px;
+      display: inline-flex;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.05);
+      color: rgba(248,244,234,0.82);
+      position: relative;
+      z-index: 1;
+    }
+
+    .tile.active-tile { border-color: rgba(212,175,55,0.38); }
+    .tile.active-tile .tag { background: rgba(212,175,55,0.14); color: var(--gold); }
+
+    .tile.teal { color: var(--teal); }
+    .tile.blue { color: var(--blue); }
+    .tile.gold { color: var(--gold); }
+    .tile.purple { color: var(--purple); }
+    .tile.amber { color: var(--amber); }
+    .tile.neutral { color: #d9d1ba; }
+
+    .tile h2, .tile p, .tile .tag, .tile-arrow { color: initial; }
+    .tile h2 { color: var(--text); }
+    .tile p { color: var(--muted); }
+    .tile .tag { color: rgba(248,244,234,0.82); }
+
+    .footer {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding-top: 4px;
+    }
+
+    .footer strong { color: var(--gold); }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.56);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      width: min(100%, 520px);
+      border-radius: 26px;
+      border: 1px solid rgba(212,175,55,0.22);
+      background: linear-gradient(180deg, rgba(24,24,24,0.98), rgba(10,10,10,0.99));
+      box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+      padding: 22px;
+      position: relative;
+      color: var(--text);
+    }
+
+    .modal h3 {
+      margin: 0 0 6px;
+      font-size: 1.6rem;
+    }
+
+    .modal .modal-sub {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .field-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .field strong { display: block; font-size: 1rem; }
+    .field small { color: var(--muted); display: block; line-height: 1.35; }
+
+    .switch {
+      appearance: none;
+      width: 56px;
+      height: 32px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.12);
+      position: relative;
+      cursor: pointer;
+      transition: background 0.18s ease;
+    }
+
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.18s ease;
+    }
+
+    .switch:checked {
+      background: rgba(212,175,55,0.42);
+      border-color: rgba(212,175,55,0.48);
+    }
+
+    .switch:checked::after { transform: translateX(24px); }
+
+    .number-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .number-row input {
+      width: 110px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.35);
+      color: var(--text);
+      padding: 11px 12px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn.secondary {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+    }
+
+    .btn.primary {
+      background: linear-gradient(180deg, #e2c258, #bc9427);
+      color: #111;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(18,18,18,0.94);
+      border: 1px solid rgba(212,175,55,0.22);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      z-index: 200;
+      font-weight: 700;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 780px) {
+      .shell { padding: 10px; }
+      .app {
+        width: 100%;
+        height: calc(100vh - 20px);
+        padding: 18px;
+        border-radius: 26px;
+      }
+      .grid { grid-template-columns: 1fr; }
+      .tile { min-height: 156px; }
+      .footer { font-size: 0.84rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="app">
+      <div class="sparkles"></div>
+
+      <div class="topbar">
+        <div>
+          <div class="eyebrow">Marriott Bonvoy</div>
+          <h1>Bonvoy Rewards Play</h1>
+          <p class="subtitle">Choose a guest game, keep the settings tucked away here, and return home automatically after each prize reveal.</p>
+        </div>
+        <button class="settings-btn" id="openSettings" aria-label="Open settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.18 7.18 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 1h-3.8a.5.5 0 0 0-.49.42l-.36 2.54c-.58.23-1.13.54-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 7.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.5.4 1.05.71 1.63.94l.36 2.54a.5.5 0 0 0 .49.42h3.8a.5.5 0 0 0 .49-.42l.36-2.54c.58-.23 1.13-.54 1.63-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/></svg>
+        </button>
+      </div>
+
+      <div class="status-row">
+        <div class="pill"><span class="dot"></span><span id="statusAuto">Auto-return off</span></div>
+        <div class="pill"><span class="dot"></span><span id="statusPath">Lucky Loop path: standard</span></div>
+        <div class="pill"><span class="dot"></span><span id="statusSound">Sound: on</span></div>
+      </div>
+
+      <div class="grid">
+        <button class="tile active-tile gold" data-link="lucky-loop.html">
+          <div class="tile-top">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24"><path d="M11 2h2v4h-2V2Zm0 16h2v4h-2v-4ZM2 11h4v2H2v-2Zm16 0h4v2h-4v-2ZM5.64 4.22l1.41-1.41 2.83 2.83-1.41 1.41-2.83-2.83Zm8.48 8.48 1.41-1.41 5.66 5.66-1.41 1.41-5.66-5.66ZM4.22 18.36l5.66-5.66 1.41 1.41-5.66 5.66-1.41-1.41Zm12.72-12.72 2.83-2.83 1.41 1.41-2.83 2.83-1.41-1.41ZM12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Zm0 2a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6Z"/></svg>
+            </div>
+            <div class="tile-arrow">›</div>
+          </div>
+          <h2>Lucky Loop</h2>
+          <p>Your upgraded Press Your Luck board. Spin, stop, reveal, and celebrate the prize with a full winner animation.</p>
+          <span class="tag">Live now</span>
+        </button>
+
+        <button class="tile teal disabled" data-soon="Spin &amp; Win is next in line.">
+          <div class="tile-top">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2.5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 12 2.5Zm0 2a7.4 7.4 0 0 1 5.23 2.17L12.71 11H6.08A7.49 7.49 0 0 1 12 4.5Zm0 15a7.49 7.49 0 0 1-5.92-2.9l5.92-4.4 5.23 4.33A7.4 7.4 0 0 1 12 19.5ZM13 12l5.68-4.72A7.45 7.45 0 0 1 19.5 12a7.4 7.4 0 0 1-1.02 3.77L13 12Z"/></svg>
+            </div>
+            <div class="tile-arrow">›</div>
+          </div>
+          <h2>Spin &amp; Win</h2>
+          <p>A portrait wheel with bigger segments, cleaner icons, and the same black-and-gold visual system.</p>
+          <span class="tag">Placeholder</span>
+        </button>
+
+        <button class="tile blue disabled" data-soon="Match &amp; Win placeholder ready.">
+          <div class="tile-top">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm0 2v12h12V6H6Zm2.5 2.5h2.5V11H8.5V8.5Zm4 0H15V11h-2.5V8.5Zm-4 4h2.5V15H8.5v-2.5Zm4 0H15V15h-2.5v-2.5Z"/></svg>
+            </div>
+            <div class="tile-arrow">›</div>
+          </div>
+          <h2>Match &amp; Win</h2>
+          <p>Luxury card backs, quick reveal pacing, and a stronger mystery moment before the match appears.</p>
+          <span class="tag">Placeholder</span>
+        </button>
+
+        <button class="tile purple disabled" data-soon="Pick Your Prize placeholder ready.">
+          <div class="tile-top">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24"><path d="M7 4h10l1 3h1a2 2 0 0 1 2 2v8.5A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5V9a2 2 0 0 1 2-2h1l1-3Zm1.44 3h7.12l-.34-1H8.78l-.34 1ZM5 9v8.5c0 .28.22.5.5.5h13a.5.5 0 0 0 .5-.5V9H5Z"/></svg>
+            </div>
+            <div class="tile-arrow">›</div>
+          </div>
+          <h2>Pick Your Prize</h2>
+          <p>Choose from 3–5 mystery suitcases with only color accents showing before the winner reveal.</p>
+          <span class="tag">Placeholder</span>
+        </button>
+
+        <button class="tile amber disabled" data-soon="Points Jackpot placeholder ready.">
+          <div class="tile-top">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm0 2v10h16V7H4Zm2 2h3v6H6V9Zm4.5 0h3v6h-3V9Zm4.5 0h3v6h-3V9Z"/></svg>
+            </div>
+            <div class="tile-arrow">›</div>
+          </div>
+          <h2>Points Jackpot</h2>
+          <p>Weighted number reels built to favor smaller wins while still leaving room for a fun bigger hit.</p>
+          <span class="tag">Placeholder</span>
+        </button>
+
+        <button class="tile neutral disabled" data-soon="More game slots are ready when you are.">
+          <div class="tile-top">
+            <div class="tile-icon">
+              <svg viewBox="0 0 24 24"><path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4Z"/></svg>
+            </div>
+            <div class="tile-arrow">›</div>
+          </div>
+          <h2>Coming Soon</h2>
+          <p>Reserved for future seasonal games, holiday promos, or property-specific one-off experiences.</p>
+          <span class="tag">Placeholder</span>
+        </button>
+      </div>
+
+      <div class="footer">
+        <div><strong>Current live game:</strong> Lucky Loop</div>
+        <div>Main settings stay here so every game can stay clean and guest-facing.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="settingsModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <h3 id="settingsTitle">Game Center Settings</h3>
+      <p class="modal-sub">Keep all operator controls here so the guest games stay clean. These settings apply to Lucky Loop right now and can be expanded later.</p>
+
+      <div class="form-grid">
+        <div class="field">
+          <div class="field-header">
+            <div>
+              <strong>Lucky Loop random path</strong>
+              <small>Turns on the less predictable highlight path from your current game.</small>
+            </div>
+            <input class="switch" id="settingRandomPath" type="checkbox" />
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <div>
+              <strong>Lucky Loop sound</strong>
+              <small>Leave this on for full win chimes and tile ticks.</small>
+            </div>
+            <input class="switch" id="settingSound" type="checkbox" />
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <div>
+              <strong>Return to home after prize reveal</strong>
+              <small>When enabled, the game returns to this menu after the configured number of seconds.</small>
+            </div>
+            <input class="switch" id="settingAutoReturn" type="checkbox" />
+          </div>
+          <div class="number-row">
+            <input id="settingReturnSeconds" type="number" min="3" max="45" step="1" />
+            <small>seconds</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn secondary" id="cancelSettings" type="button">Cancel</button>
+        <button class="btn primary" id="saveSettings" type="button">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'bonvoyRewardsPlaySettings';
+    const DEFAULT_SETTINGS = {
+      appName: 'Bonvoy Rewards Play',
+      autoReturnEnabled: true,
+      autoReturnSeconds: 10,
+      luckyLoopRandomPath: false,
+      luckyLoopSound: true
+    };
+
+    function getSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        return { ...DEFAULT_SETTINGS, ...saved };
+      } catch (err) {
+        return { ...DEFAULT_SETTINGS };
+      }
+    }
+
+    function saveSettings(settings) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    }
+
+    const modal = document.getElementById('settingsModal');
+    const toast = document.getElementById('toast');
+    const statusAuto = document.getElementById('statusAuto');
+    const statusPath = document.getElementById('statusPath');
+    const statusSound = document.getElementById('statusSound');
+
+    const settingRandomPath = document.getElementById('settingRandomPath');
+    const settingSound = document.getElementById('settingSound');
+    const settingAutoReturn = document.getElementById('settingAutoReturn');
+    const settingReturnSeconds = document.getElementById('settingReturnSeconds');
+
+    function renderStatuses() {
+      const settings = getSettings();
+      statusAuto.textContent = settings.autoReturnEnabled
+        ? `Auto-return: ${settings.autoReturnSeconds}s`
+        : 'Auto-return off';
+      statusPath.textContent = `Lucky Loop path: ${settings.luckyLoopRandomPath ? 'random' : 'standard'}`;
+      statusSound.textContent = `Sound: ${settings.luckyLoopSound ? 'on' : 'off'}`;
+    }
+
+    function openModal() {
+      const settings = getSettings();
+      settingRandomPath.checked = !!settings.luckyLoopRandomPath;
+      settingSound.checked = !!settings.luckyLoopSound;
+      settingAutoReturn.checked = !!settings.autoReturnEnabled;
+      settingReturnSeconds.value = settings.autoReturnSeconds;
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeModal() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    let toastTimer = null;
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    document.getElementById('openSettings').addEventListener('click', openModal);
+    document.getElementById('cancelSettings').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    document.getElementById('saveSettings').addEventListener('click', () => {
+      const seconds = Math.max(3, Math.min(45, Number(settingReturnSeconds.value || DEFAULT_SETTINGS.autoReturnSeconds)));
+      const settings = {
+        ...getSettings(),
+        luckyLoopRandomPath: settingRandomPath.checked,
+        luckyLoopSound: settingSound.checked,
+        autoReturnEnabled: settingAutoReturn.checked,
+        autoReturnSeconds: seconds
+      };
+      saveSettings(settings);
+      renderStatuses();
+      closeModal();
+      showToast('Settings saved');
+    });
+
+    document.querySelectorAll('.tile').forEach((tile) => {
+      tile.addEventListener('click', () => {
+        const link = tile.dataset.link;
+        const soon = tile.dataset.soon;
+        if (link) {
+          window.location.href = link;
+          return;
+        }
+        if (soon) showToast(soon);
+      });
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    renderStatuses();
+  </script>
+</body>
+</html>
